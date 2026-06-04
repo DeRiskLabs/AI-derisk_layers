@@ -104,8 +104,12 @@ From the layers gem (`Layers::Graphql::BaseEndpoint`):
 - `user_story_arg :current_identity` — merges the named private method's value into the
   story's inputs; raises `InvalidUserStoryArgumentMethod` if the method is missing.
 - `#resolve(**args)` — captures client args, runs the story with
-  `listener: self, on_success: :success, on_failure: :failure`, and converts any raised
-  error into a `GraphQL::ExecutionError`.
+  `listener: self, on_success: :success, on_failure: :failure`, and MASKS any raised
+  error: the source error is logged with backtrace, the client receives a
+  `GraphQL::ExecutionError` carrying only `Layers.configuration.masked_error_message`.
+  Execution-error instances pass through; `exposed_error_classes` allowlists safe domain
+  errors; `reveal_masked_errors` (e.g. `Rails.env.local?`) restores full messages in
+  development.
 - `success`/`failure` forward to the `on_success`/`on_failure` you implement
   (`NotImplementedError` otherwise).
 
