@@ -4,7 +4,7 @@ title: Authoring GraphQL Endpoints
 description: Hub for the GraphQL delivery layer - engine anatomy, base classes wiring Layers::Graphql::BaseEndpoint, base and domain types, schema wiring, and the acceptance-only testing strategy. Use when adding or changing files under an apis/graph engine.
 category: architecture
 status: active
-version: 2.3
+version: 2.4
 applies_to:
   - Ruby
   - Rails

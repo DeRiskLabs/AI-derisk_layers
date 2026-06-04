@@ -107,9 +107,10 @@ From the layers gem (`Layers::Graphql::BaseEndpoint`):
   `listener: self, on_success: :success, on_failure: :failure`, and MASKS any raised
   error: the source error is logged with backtrace, the client receives a
   `GraphQL::ExecutionError` carrying only `Layers.configuration.masked_error_message`.
-  Execution-error instances pass through; `exposed_error_classes` allowlists safe domain
-  errors; `reveal_masked_errors` (e.g. `Rails.env.local?`) restores full messages in
-  development.
+  Execution-error instances and the gem's wiring errors (`InvalidUserStory`,
+  `InvalidUserStoryArgumentMethod`) pass through as themselves; `exposed_error_classes`
+  allowlists safe domain errors; `reveal_masked_errors` (e.g. `Rails.env.local?`)
+  restores full messages in development.
 - `success`/`failure` forward to the `on_success`/`on_failure` you implement
   (`NotImplementedError` otherwise).
 
