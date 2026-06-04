@@ -1,0 +1,26 @@
+# derisk_layers
+
+Using the layers gem in a Rails app. Assumes: derisk_common, derisk_ruby, derisk_rails.
+
+## Architecture (read first)
+
+- [[rails-app-architecture]] — topology, request flow, where to start, the pairing rule (the hub).
+- [[layered-architecture-placement]] — which layer object to write and where it lives.
+
+## Authoring
+
+- [[authoring-controllers]] — REST/JSON:API controllers (thin; delegate to use cases).
+- [[authoring-use-cases]] — single transactional writes (`UseCases::*`).
+- [[authoring-user-stories]] — orchestration objects (`UserStories::*`).
+- [[authoring-query-objects]] — scoped, composable reads (`Queries::*`).
+- [[authoring-graphql]] — GraphQL layer hub: engine anatomy, base classes, types, wiring.
+- [[authoring-graphql-mutations]] — declarative mutations via `user_story` / `user_story_arg`.
+- [[authoring-graphql-queries]] — declarative query resolvers; scoping in the user story.
+
+## Testing
+
+- [[testing-use-cases]] — message-passing use-case specs.
+- [[testing-query-objects]] — DB-backed boundary specs for query objects.
+- [[testing-user-stories]] — orchestration/user-story specs.
+- [[testing-graphql]] — GraphQL acceptance specs (the ONLY GraphQL spec layer).
+- [[testing-layers-base-classes]] — the Layers::BaseLayer family: gem base classes, DSL mixins, app base classes.

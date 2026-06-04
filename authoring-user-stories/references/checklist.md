@@ -1,0 +1,26 @@
+# common_agent_skills/derisk_layers/authoring-user-stories/references/checklist.md
+
+
+# Authoring Checklist — User Stories
+
+## Placement & shape
+- [ ] File at `app/user_stories/graph/<domain>/<action>.rb` (or engine equivalent).
+- [ ] Class `UserStories::Graph::<Domain>::<Action>`, inherits the relevant base
+      (`UserStories::Graph::Base` / `<Engine>::BaseUserStory`) over `Layers::BaseLayer`.
+- [ ] Inputs declared with `required` / `optional`.
+
+## #call orchestration
+- [ ] Reads as a sequence of guard clauses + one happy path.
+- [ ] Find step looks up by public uuid and guards missing records with `failure(errors: [...])`.
+- [ ] Authorization step guards unauthorized actors with `failure(errors: [...])`.
+- [ ] Reports via `success(result:)` / `failure(errors:)` — never returns a value.
+- [ ] Transactional writes delegated to a use case; complex reads to a query object.
+
+## Boundaries
+- [ ] No HTTP/GraphQL response shaping (that is the endpoint's job).
+- [ ] No duplicated transactional logic that belongs in a use case.
+- [ ] Detail pushed into private methods or collaborators.
+
+## Verify
+- [ ] Spec following [[testing-user-stories]] covers success, validation failure, not-found,
+      and not-authorized.
