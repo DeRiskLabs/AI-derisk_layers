@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API and feature engines, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 1.3
+version: 1.4
 applies_to:
   - Ruby
   - Rails
@@ -42,6 +42,10 @@ writing.
 2. **Thin framework edges, fat domain objects.** Controllers and GraphQL endpoints only
    translate and render. Behaviour lives in layer objects (use cases, user stories, forms,
    query objects) built on `Layers::BaseLayer` — see [[layered-architecture-placement]].
+   The user story is the port between the two: the boundary of a user interaction, out of
+   the delivery layer into business logic and back. The use case is the entry point to the
+   business logic itself — callable by a user story, a job, or any other actor, and it
+   never calls a user story.
 3. **Message passing over return values.** Use cases and user stories report outcomes by
    calling back a `listener` (`success`/`failure`), so the same object serves REST, GraphQL,
    and tests unchanged.

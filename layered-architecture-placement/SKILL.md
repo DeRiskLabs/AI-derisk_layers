@@ -4,7 +4,7 @@ title: Layered Architecture and Placement
 description: The mental model for the layer abstractions (user stories, use cases, query objects, form objects), what each is responsible for, how they collaborate, and where each file lives. Load when deciding which abstraction to write or where to put it.
 category: architecture
 status: active
-version: 1.3
+version: 1.4
 applies_to:
   - Ruby
   - Rails
@@ -59,10 +59,30 @@ references/request-flow.md     # a request traced through the layers
 | Serializer | Present data as JSON:API | response hash | [[authoring-serializers]] |
 
 
+## Why a User Story and a Use Case (Ports & Adapters)
+
+The two layers behave identically — both inherit `Layers::BaseLayer` and report via
+`success`/`failure` — but they exist for different hexagonal reasons:
+
+- A **user story** is the boundary of a user interaction: the port out of the delivery
+  layer (controller stack, GraphQL endpoint, any user interaction point) into the
+  business-logic layer and back. That is *why* a controller or endpoint calls a user story —
+  crossing it exits Rails/GraphQL entirely, and nothing below it knows the delivery
+  mechanism.
+- A **use case** is the entry point to business logic. It performs or coordinates the work
+  inside its bounded context and calls back to its listener once that work is complete. Its
+  caller can be a user story, a job, or any other actor in the system.
+
+**Direction rule: a use case never calls a user story.** User interaction boundary →
+business logic, never the reverse.
+
+
 ## Decision Guide
 
 - A whole user action (find → authorize → do → respond)? → **user story**.
 - One transactional write, reusable, no orchestration? → **use case**.
+- Work invoked by a job or another internal actor — no user interaction? → **use case**;
+  user stories serve user interaction points only.
 - Validating params and constructing objects to persist? → **form object**.
 - A read with scoping/joins reused across callers? → **query object**.
 - Data integrity / a tiny pure accessor? → **model**.

@@ -4,7 +4,7 @@ title: Authoring User Stories
 description: How to write a user story - a Layers::BaseLayer subclass that orchestrates one unit of user-facing behaviour (find, authorize, compose forms/use-cases/queries) and reports via success/failure. Use when adding or changing classes under a boundary's app/lib/user_stories.
 category: architecture
 status: active
-version: 1.3
+version: 1.4
 applies_to:
   - Ruby
   - Rails
@@ -32,6 +32,11 @@ A user story is a `Layers::BaseLayer` subclass that orchestrates **one unit of u
 behaviour**: find the records, authorize the actor, then compose forms, use cases, and query
 objects to satisfy the request. It is the entry point a delivery mechanism (GraphQL endpoint,
 controller) drives, and it reports via message passing.
+
+In ports-and-adapters terms, a user story is **the boundary of the user interaction**: the
+way out of the delivery layer (controller stack, GraphQL endpoint, any user interaction
+point) into the business-logic layer and back. That is why the delivery adapter calls a
+user story — crossing it exits Rails/GraphQL entirely.
 
 
 ## Required Reading
@@ -121,6 +126,9 @@ end
 
 - A user story spans the **whole** user action; a use case is the single transactional step
   inside it. If there is no orchestration (just one transactional write), write a use case.
+- Only delivery adapters (user interaction points) call user stories. Use cases, jobs, and
+  other internal actors never do — a user story is the interaction boundary, not a shared
+  internal helper.
 - Report through `success(...)` / `failure(...)` only. Failures carry an `errors:` payload
   (array of strings or an `errors` object) so the endpoint can render them.
 - Authorization and "does it exist" live here, not in the use case.

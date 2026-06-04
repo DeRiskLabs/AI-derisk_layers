@@ -4,7 +4,7 @@ title: Authoring Use Cases
 description: How to write a use-case object - a Layers::BaseLayer subclass that performs one transactional unit of work and reports via success/failure. Use when adding or changing classes under app/lib/use_cases.
 category: architecture
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-04
 ---
 
 
@@ -31,6 +31,10 @@ last_reviewed_at: 2026-06-03
 A use case is a `Layers::BaseLayer` subclass that performs **one transactional unit of
 domain work** (create/update/delete) and reports the outcome by message passing. It does not
 know its caller; it calls back a listener.
+
+A use case is **the entry point to business logic**: it performs or coordinates the work
+inside its bounded context, then calls back to the listener once that work is complete. Its
+caller can be a user story, a job, or any other actor in the system.
 
 
 ## Required Reading
@@ -107,6 +111,9 @@ end
 - Side effects (emails, jobs) belong on observers or are triggered by the caller, not buried
   in `#call`. Keep the use case focused on its transactional work.
 - No knowledge of HTTP, GraphQL, or the controller. Those live above the use case.
+- Never call a user story from a use case. A user story is the boundary of a user
+  interaction; a use case sits below it — user interaction boundary → business logic, never
+  the reverse.
 
 
 ## Avoid

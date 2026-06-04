@@ -80,8 +80,13 @@ main app's `app/lib/`; anything specific to an API or feature boundary — user 
 included — lives in that engine's mirror of this structure, with an engine-local base class
 over the gem's base.
 
-Never invent new top-level `app/<abstraction>/` directories for your own abstractions:
-Zeitwerk roots every `app/*` subdirectory WITHOUT a namespace, so `app/user_stories/...`
-files would define un-namespaced constants (or need custom autoloader wiring). Under
-`app/lib/` the directory structure yields the namespace for free
-(`app/lib/user_stories/graph/foo.rb` → `UserStories::Graph::Foo`).
+Own abstractions always live under `app/lib/<abstraction>/` — never invent new top-level
+`app/<abstraction>/` directories. The rule and its Zeitwerk rationale live in the general
+skill:
+
+```text
+common_agent_skills/derisk_rails/app-lib-placement/SKILL.md
+```
+
+The layers-specific overlay is choosing WHICH boundary's `app/lib`: the one that owns the
+abstraction.
