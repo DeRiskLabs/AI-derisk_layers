@@ -4,7 +4,7 @@ title: Authoring Query Objects
 description: How to write a query object - a class that encapsulates a scoped, composable ActiveRecord query behind a small interface. Use when adding or changing classes under app/lib/queries.
 category: architecture
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -21,7 +21,7 @@ anti_triggers:
   - user story
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-04
 ---
 
 
@@ -80,6 +80,10 @@ end
 
 A method that returns a relation or array from the middle of the chain breaks
 composability; a refiner that forgets `self` breaks every call after it.
+
+Order matters: **refiners first, terminators last**. The delegated AR messages return
+relations or values — not the query object — so a `where` mid-chain exits the query
+object and everything after it is plain ActiveRecord, not your refiners.
 
 
 ## Anatomy

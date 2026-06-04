@@ -4,7 +4,7 @@ title: Authoring Use Cases
 description: How to write a use-case object - a Layers::BaseLayer subclass that performs one transactional unit of work and reports via success/failure. Use when adding or changing classes under app/lib/use_cases.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -104,6 +104,9 @@ end
 ## Rules
 
 - One use case = one action. If you reach for "and", split it (and compose from a user story).
+- Declarations are per-class: `required`/`optional`, `observer`, and `default_callbacks`
+  apply only to the declaring class — nothing inherits. State the complete contract in
+  the concrete class; keep base classes behavioural (includes, shared private helpers).
 - Report **only** through `success(...)` / `failure(...)`; never return ad-hoc values or
   raise out of `#call` for expected failures.
 - Keep keyword payloads stable and meaningful (`success(account:)`, `failure(form:)`) — they
