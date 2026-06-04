@@ -4,7 +4,7 @@ title: Layered Architecture and Placement
 description: The mental model for the layer abstractions (user stories, use cases, query objects, form objects), what each is responsible for, how they collaborate, and where each file lives. Load when deciding which abstraction to write or where to put it.
 category: architecture
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -19,7 +19,7 @@ triggers:
 anti_triggers:
   - pure framework config
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-04
 ---
 
 
@@ -90,7 +90,7 @@ the adapter renders via a serializer. No layer below the adapter knows about HTT
 ## Placement (summary — see references/directory-map.md)
 
 ```
-app/user_stories/graph/<domain>/<action>.rb     UserStories::Graph::<Domain>::<Action>
+app/lib/user_stories/graph/<domain>/<action>.rb  UserStories::Graph::<Domain>::<Action>
 app/lib/use_cases/<domain>/<action>.rb           UseCases::<Domain>::<Action>
 app/lib/forms/<domain>/<action>_form.rb           Forms::<Domain>::<Action>Form
 app/lib/queries/<scope>/<name>_query.rb           Queries::<Scope>::<Name>Query

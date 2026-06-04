@@ -4,7 +4,7 @@
 # Authoring Checklist — User Stories
 
 ## Placement & shape
-- [ ] File at `app/user_stories/graph/<domain>/<action>.rb` (or engine equivalent).
+- [ ] File at `app/lib/user_stories/graph/<domain>/<action>.rb` (or engine equivalent).
 - [ ] Class `UserStories::Graph::<Domain>::<Action>`, inherits the relevant base
       (`UserStories::Graph::Base` / `<Engine>::BaseUserStory`) over `Layers::BaseLayer`.
 - [ ] Inputs declared with `required` / `optional`.

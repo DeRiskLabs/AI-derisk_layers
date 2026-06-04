@@ -24,7 +24,7 @@ engines/
   (REST, GraphQL) and own protocol-specific concerns: serializers, types, error formatting,
   authentication wiring. They may contain protocol-specific forms (e.g.
   `Forms::V1::ProfileUpdate`); graph-facing **user stories live in the main app**
-  (`app/user_stories/graph/...`) — the engine declares them by name and only the thin
+  (`app/lib/user_stories/graph/...`) — the engine declares them by name and only the thin
   `UserStories::Graph::Base` may live engine-side.
 - **Feature engines (`engines/*`)** own a bounded slice of the domain (auth, collaboration,
   info vault): their controllers/views/jobs/mailers and their own `app/lib/...` layer objects.
@@ -53,8 +53,8 @@ Graph::Mutations::ApplicationMutation / Graph::Resolvers::ApplicationResolver
 1. Decide the boundary: which engine owns this? (REST → `apis/v1`; GraphQL → `apis/graph`;
    domain feature → the relevant `engines/*`; shared → main app.)
 2. Write/extend the **layer objects** first (form, use case or user story, query) in their
-   homes — user stories under `app/user_stories/...`, the rest under the boundary's
-   `app/lib/...` — each over the boundary's base class. Test them.
+   homes under the boundary's `app/lib/...` (user stories included) — each over the
+   boundary's base class. Test them.
 3. Add the **delivery adapter** (controller action or GraphQL mutation/resolver) that builds
    the form and calls the user story / use case as listener.
 4. Add the **serializer / type** for the response.

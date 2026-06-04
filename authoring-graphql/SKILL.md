@@ -4,7 +4,7 @@ title: Authoring GraphQL Endpoints
 description: Hub for the GraphQL delivery layer - engine anatomy, base classes wiring Layers::Graphql::BaseEndpoint, base and domain types, schema wiring, and the acceptance-only testing strategy. Use when adding or changing files under an apis/graph engine.
 category: architecture
 status: active
-version: 2.0
+version: 2.1
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - use case internals
   - model logic
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-04
 ---
 
 
@@ -76,7 +76,7 @@ apis/graph/app/graphql/graph/
   resolvers/<domain>/<name>.rb        # concrete resolvers
 ```
 
-User stories the endpoints call live in `app/user_stories/graph/<domain>/<action>.rb`
+User stories the endpoints call live in `app/lib/user_stories/graph/<domain>/<action>.rb`
 (see [[authoring-user-stories]]).
 
 
