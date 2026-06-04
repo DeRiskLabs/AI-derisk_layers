@@ -4,7 +4,7 @@ title: Layered Architecture and Placement
 description: The mental model for the layer abstractions (user stories, use cases, query objects, form objects), what each is responsible for, how they collaborate, and where each file lives. Load when deciding which abstraction to write or where to put it.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -90,14 +90,16 @@ the adapter renders via a serializer. No layer below the adapter knows about HTT
 ## Placement (summary — see references/directory-map.md)
 
 ```
-app/lib/user_stories/graph/<domain>/<action>.rb  UserStories::Graph::<Domain>::<Action>
-app/lib/use_cases/<domain>/<action>.rb           UseCases::<Domain>::<Action>
+app/lib/use_cases/<domain>/<action>.rb            UseCases::<Domain>::<Action>
 app/lib/forms/<domain>/<action>_form.rb           Forms::<Domain>::<Action>Form
 app/lib/queries/<scope>/<name>_query.rb           Queries::<Scope>::<Name>Query
 app/models/<model>.rb                             <Model>
 apis/v1/app/controllers/v1/<resource>_controller.rb
 apis/v1/app/serializers/v1/<resource>_serializer.rb
 apis/graph/app/graphql/graph/{mutations,resolvers,types}/...
+apis/graph/app/lib/user_stories/graph/<domain>/<action>.rb  UserStories::Graph::<Domain>::<Action>
 ```
 
-Engines and API engines carry their own `app/lib/...` and base classes.
+Engines and API engines carry their own `app/lib/...` and base classes. A user story lives
+in the boundary that owns it: graph-facing user stories are boundaries of the graph API, so
+they live in the graph engine's `app/lib/user_stories/` — not in the main app.

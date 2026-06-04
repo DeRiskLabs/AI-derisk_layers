@@ -9,11 +9,10 @@ How the codebase is split, and how to add to it.
 ## Top-level shape
 
 ```
-app/                  main app: user_stories (incl. graph/), lib/{use_cases,queries,forms},
-                      models, validators
+app/                  main app: lib/{use_cases,queries,forms}, models, validators
 apis/
   v1/                 REST/JSON:API engine: controllers, serializers, lib/{use_cases,forms}, jobs
-  graph/              GraphQL engine: graphql/{types,mutations,resolvers}
+  graph/              GraphQL engine: graphql/{types,mutations,resolvers}, lib/user_stories/graph
 engines/
   auth/               feature engine: controllers, views, jobs, mailers, lib/...
   collab/             feature engine
@@ -22,14 +21,16 @@ engines/
 
 - **API engines (`apis/*`)** are delivery boundaries. They expose the app over a protocol
   (REST, GraphQL) and own protocol-specific concerns: serializers, types, error formatting,
-  authentication wiring. They may contain protocol-specific forms (e.g.
-  `Forms::V1::ProfileUpdate`); graph-facing **user stories live in the main app**
-  (`app/lib/user_stories/graph/...`) — the engine declares them by name and only the thin
-  `UserStories::Graph::Base` may live engine-side.
+  authentication wiring — and **their own user stories**: graph-facing user stories are
+  boundaries of the graph API, so they live inside the engine
+  (`apis/graph/app/lib/user_stories/graph/...`). The endpoint declares them by name
+  (`user_story 'user_stories/graph/...'`); the engine's `app/lib` is an autoload root, so
+  the `UserStories::Graph::*` constants are unchanged. Protocol-specific forms (e.g.
+  `Forms::V1::ProfileUpdate`) live engine-side too.
 - **Feature engines (`engines/*`)** own a bounded slice of the domain (auth, collaboration,
   info vault): their controllers/views/jobs/mailers and their own `app/lib/...` layer objects.
-- The **main app** holds shared domain: models, cross-cutting user stories, use cases,
-  queries, and forms not owned by a single engine.
+- The **main app** holds shared domain not owned by a single engine: models, use cases,
+  queries, forms, and any user stories the main app itself owns.
 
 
 ## Base classes per boundary
@@ -38,7 +39,7 @@ Each engine/boundary defines a thin base over the `layers` gem so its objects sh
 
 ```
 UseCases::ApplicationUseCase        < Layers::BaseLayer     (main app use cases)
-UserStories::Graph::Base            < Layers::BaseLayer     (+ ActiveModel::Validations)
+UserStories::Graph::Base            < Layers::BaseLayer     (graph-engine user stories; + ActiveModel::Validations)
 <Engine>::BaseUserStory             < Layers::BaseLayer     (feature-engine user stories)
 Queries::ApplicationQuery                                   (query objects; uses Paginatable)
 V1::ApplicationController           < ActionController::Base (+ ErrorHandling, Authorization)

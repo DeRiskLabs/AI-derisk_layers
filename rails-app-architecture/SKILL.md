@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API and feature engines, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails

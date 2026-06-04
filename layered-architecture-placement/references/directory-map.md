@@ -11,8 +11,6 @@ under their own roots and define their own base classes.
 ```
 app/
   lib/
-    user_stories/
-      graph/<domain>/<action>.rb      UserStories::Graph::<Domain>::<Action>   (< UserStories::Graph::Base)
     use_cases/
       application_use_case.rb         UseCases::ApplicationUseCase             (< Layers::BaseLayer)
       <domain>/<action>.rb            UseCases::<Domain>::<Action>             (< ApplicationUseCase)
@@ -45,22 +43,25 @@ apis/v1/app/
 ## GraphQL API engine (apis/graph)
 
 ```
-apis/graph/app/graphql/graph/
-  mutations/application_mutation.rb   Graph::Mutations::ApplicationMutation    (include Layers::Graphql::BaseEndpoint)
-  mutations/<action>.rb               Graph::Mutations::<Action>
-  resolvers/application_resolver.rb   Graph::Resolvers::ApplicationResolver    (include Layers::Graphql::BaseEndpoint)
-  resolvers/<name>.rb                 Graph::Resolvers::<Name>
-  types/base/*.rb                     Graph::Types::Base::{Object,Field,...}
-  types/<domain>/<name>_type.rb       domain types
+apis/graph/app/
+  graphql/graph/
+    mutations/application_mutation.rb Graph::Mutations::ApplicationMutation    (include Layers::Graphql::BaseEndpoint)
+    mutations/<action>.rb             Graph::Mutations::<Action>
+    resolvers/application_resolver.rb Graph::Resolvers::ApplicationResolver    (include Layers::Graphql::BaseEndpoint)
+    resolvers/<name>.rb               Graph::Resolvers::<Name>
+    types/base/*.rb                   Graph::Types::Base::{Object,Field,...}
+    types/<domain>/<name>_type.rb     domain types
+  lib/
+    user_stories/graph/
+      base.rb                         UserStories::Graph::Base                 (< Layers::BaseLayer)
+      <domain>/<action>.rb            UserStories::Graph::<Domain>::<Action>   (< UserStories::Graph::Base)
 ```
 
-Graph-facing user stories live in the MAIN app (`app/lib/user_stories/graph/...`), not inside
-the engine — the engine declares them by name (`user_story 'user_stories/graph/...'`) and
-the behaviour stays in the app's domain layer. Only the thin `UserStories::Graph::Base`
-may live engine-side.
-
-```
-```
+Graph-facing user stories are boundaries of the graph API, so they live INSIDE the engine
+(`apis/graph/app/lib/user_stories/graph/...`), not in the main app. The engine's `app/lib`
+is an autoload root, so the constants are still `UserStories::Graph::<Domain>::<Action>` and
+endpoints still declare them as `user_story 'user_stories/graph/...'` — placement changes,
+names do not.
 
 ## Feature engines (engines/<engine>)
 
@@ -73,9 +74,11 @@ engines/<engine>/app/
 
 ## Rule of thumb
 
-Cross-cutting/domain logic for the main app goes under `app/lib/<type>/<domain>/` — user
-stories included. Anything specific to an API or feature boundary lives in that engine's
-mirror of this structure, with an engine-local base class over the gem's base.
+A layer object lives in the boundary that owns it, always under that boundary's
+`app/lib/<type>/<domain>/`. Cross-cutting/domain logic owned by the main app goes under the
+main app's `app/lib/`; anything specific to an API or feature boundary — user stories
+included — lives in that engine's mirror of this structure, with an engine-local base class
+over the gem's base.
 
 Never invent new top-level `app/<abstraction>/` directories for your own abstractions:
 Zeitwerk roots every `app/*` subdirectory WITHOUT a namespace, so `app/user_stories/...`

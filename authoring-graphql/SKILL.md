@@ -4,7 +4,7 @@ title: Authoring GraphQL Endpoints
 description: Hub for the GraphQL delivery layer - engine anatomy, base classes wiring Layers::Graphql::BaseEndpoint, base and domain types, schema wiring, and the acceptance-only testing strategy. Use when adding or changing files under an apis/graph engine.
 category: architecture
 status: active
-version: 2.1
+version: 2.2
 applies_to:
   - Ruby
   - Rails
@@ -64,20 +64,22 @@ Test with [[testing-graphql]] — acceptance specs only (see Testing Strategy).
 ## Engine Anatomy
 
 ```text
-apis/graph/app/graphql/graph/
-  platform_schema.rb                  # GraphQL::Schema; query/mutation roots
-  types/query_type.rb                 # field :articles, resolver: Resolvers::Articles::Articles
-  types/mutation_type.rb              # field :create_article, mutation: Mutations::CreateArticle
-  types/base/                         # Argument, Field, Object, Enum, Scalar, ErrorType, UuidType, ...
-  types/<domain>/type.rb              # domain object types
-  mutations/application_mutation.rb   # base: includes Layers::Graphql::BaseEndpoint
-  mutations/<domain>/<action>.rb      # concrete mutations
-  resolvers/application_resolver.rb   # base: includes Layers::Graphql::BaseEndpoint
-  resolvers/<domain>/<name>.rb        # concrete resolvers
+apis/graph/app/
+  graphql/graph/
+    platform_schema.rb                # GraphQL::Schema; query/mutation roots
+    types/query_type.rb               # field :articles, resolver: Resolvers::Articles::Articles
+    types/mutation_type.rb            # field :create_article, mutation: Mutations::CreateArticle
+    types/base/                       # Argument, Field, Object, Enum, Scalar, ErrorType, UuidType, ...
+    types/<domain>/type.rb            # domain object types
+    mutations/application_mutation.rb # base: includes Layers::Graphql::BaseEndpoint
+    mutations/<domain>/<action>.rb    # concrete mutations
+    resolvers/application_resolver.rb # base: includes Layers::Graphql::BaseEndpoint
+    resolvers/<domain>/<name>.rb      # concrete resolvers
+  lib/user_stories/graph/             # the user stories the endpoints declare
 ```
 
-User stories the endpoints call live in `app/lib/user_stories/graph/<domain>/<action>.rb`
-(see [[authoring-user-stories]]).
+User stories are boundaries of the graph API, so they live inside the engine at
+`apis/graph/app/lib/user_stories/graph/<domain>/<action>.rb` (see [[authoring-user-stories]]).
 
 
 ## The Base Classes

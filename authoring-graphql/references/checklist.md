@@ -10,7 +10,7 @@
 - [ ] Types under `apis/graph/app/graphql/graph/types/<domain>/`; base types under `types/base/`.
 - [ ] Concrete endpoints inherit `ApplicationMutation`/`ApplicationResolver` (the only
       places `Layers::Graphql::BaseEndpoint` is included).
-- [ ] User stories under `app/lib/user_stories/graph/<domain>/<action>.rb`.
+- [ ] User stories inside the engine, under `apis/graph/app/lib/user_stories/graph/<domain>/<action>.rb`.
 
 
 ## Delegation & trust

@@ -1,10 +1,10 @@
 ---
 name: authoring-user-stories
 title: Authoring User Stories
-description: How to write a user story - a Layers::BaseLayer subclass that orchestrates one unit of user-facing behaviour (find, authorize, compose forms/use-cases/queries) and reports via success/failure. Use when adding or changing classes under app/lib/user_stories or an engine's user_stories.
+description: How to write a user story - a Layers::BaseLayer subclass that orchestrates one unit of user-facing behaviour (find, authorize, compose forms/use-cases/queries) and reports via success/failure. Use when adding or changing classes under a boundary's app/lib/user_stories.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -53,9 +53,17 @@ Test it with [[testing-user-stories]]. Composes [[authoring-use-cases]],
 
 ## Placement and Naming
 
+A user story lives in the boundary that owns it, under that boundary's
+`app/lib/user_stories/`. Graph-facing user stories are boundaries of the graph API, so they
+live inside the graph engine:
+
 ```text
-app/lib/user_stories/graph/<domain>/<action>.rb  →  UserStories::Graph::<Domain>::<Action>
+apis/graph/app/lib/user_stories/graph/<domain>/<action>.rb  →  UserStories::Graph::<Domain>::<Action>
 ```
+
+The engine's `app/lib` is an autoload root, so the constants and the
+`user_story 'user_stories/graph/...'` declaration strings are unaffected by which boundary
+holds the file.
 
 A thin base sits above `Layers::BaseLayer`:
 `UserStories::Graph::Base < Layers::BaseLayer` (adds `include ActiveModel::Validations`).
