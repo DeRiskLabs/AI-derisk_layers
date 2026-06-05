@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-user-stories/references/annotated-example.md
-
-
 # Annotated Example — User Story
 
 Neutral domain: `UserStories::Graph::Articles::Update` — update an article the current

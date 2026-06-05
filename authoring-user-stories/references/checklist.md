@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-user-stories/references/checklist.md
-
-
 # Authoring Checklist — User Stories
 
 ## Placement & shape

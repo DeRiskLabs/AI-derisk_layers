@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-graphql/references/checklist.md
-
-
 # Review Checklist — GraphQL Acceptance Specs
 
 

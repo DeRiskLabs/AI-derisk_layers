@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-query-objects/references/checklist.md
-
-
 # Authoring Checklist — Query Objects
 
 ## Placement & shape

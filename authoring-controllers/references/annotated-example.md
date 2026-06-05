@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-controllers/references/annotated-example.md
-
-
 # Annotated Examples — Controllers
 
 Two annotated controllers: a JSON:API resource controller (neutral domain:

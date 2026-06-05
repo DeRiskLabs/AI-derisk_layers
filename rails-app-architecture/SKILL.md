@@ -24,9 +24,6 @@ last_reviewed_at: 2026-06-04
 ---
 
 
-# common_agent_skills/derisk_layers/rails-app-architecture/SKILL.md
-
-
 # Rails App Architecture (House Style)
 
 The entry-point guide for building Rails apps in this house style. Read this first; it gives

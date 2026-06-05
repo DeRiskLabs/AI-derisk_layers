@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-graphql-mutations/references/checklist.md
-
-
 # Authoring Checklist — GraphQL Mutations
 
 - [ ] Under `mutations/<domain>/<action>.rb`, inherits `ApplicationMutation`.

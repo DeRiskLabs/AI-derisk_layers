@@ -26,9 +26,6 @@ last_reviewed_at: 2026-06-03
 ---
 
 
-# common_agent_skills/derisk_layers/testing-query-objects/SKILL.md
-
-
 # Testing Query Objects
 
 Query objects (`Queries::*`) are the reads extracted from models — real logic objects, so

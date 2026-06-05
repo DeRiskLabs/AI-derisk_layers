@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-controllers/references/checklist.md
-
-
 # Authoring Checklist — Controllers
 
 

@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-use-cases/references/annotated-example.md
-
-
 # Annotated Example — Use Case
 
 Neutral domain: `UseCases::Profiles::Update` — update a profile from a validated form. The

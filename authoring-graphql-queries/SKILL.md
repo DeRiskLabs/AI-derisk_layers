@@ -25,9 +25,6 @@ last_reviewed_at: 2026-06-03
 ---
 
 
-# common_agent_skills/derisk_layers/authoring-graphql-queries/SKILL.md
-
-
 # Authoring GraphQL Queries
 
 A query resolver is a **pure declaration**: optional arguments, a return type, and one line

@@ -28,9 +28,6 @@ last_reviewed_at: 2026-06-04
 ---
 
 
-# common_agent_skills/derisk_layers/testing-layers-base-classes/SKILL.md
-
-
 # Testing Layers Base Classes
 
 Use this skill to test the `Layers::BaseLayer` family: the gem's own base classes and DSL

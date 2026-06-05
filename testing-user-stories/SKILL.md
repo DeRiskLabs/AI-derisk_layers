@@ -26,9 +26,6 @@ last_reviewed_at: 2026-06-03
 ---
 
 
-# common_agent_skills/derisk_layers/testing-user-stories/SKILL.md
-
-
 # Testing User Stories
 
 User stories (`UserStories::*`, e.g. `UserStories::Graph::Articles::Update`) are

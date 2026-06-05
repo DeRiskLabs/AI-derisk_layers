@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/layered-architecture-placement/references/request-flow.md
-
-
 # Request Flow — A Write Traced Through the Layers
 
 A concrete trace of "update a profile" through every layer, showing who calls whom and who

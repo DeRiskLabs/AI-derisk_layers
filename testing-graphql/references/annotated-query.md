@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-graphql/references/annotated-query.md
-
-
 # Annotated Example — GraphQL Query Acceptance Spec
 
 Neutral domain: an `articles` list query. Queries differ from mutations: build fixtures with

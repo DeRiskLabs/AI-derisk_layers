@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/rails-app-architecture/references/engine-layout.md
-
-
 # Engine Layout — The Modular Monolith
 
 How the codebase is split, and how to add to it.

@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-graphql-queries/references/checklist.md
-
-
 # Authoring Checklist — GraphQL Queries
 
 - [ ] Under `resolvers/<domain>/<name>.rb`, inherits `ApplicationResolver`; plural class for

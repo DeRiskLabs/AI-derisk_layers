@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/layered-architecture-placement/references/directory-map.md
-
-
 # Directory Map — Where Each Abstraction Lives
 
 Concrete placement and naming for every layer abstraction. Engines and API engines mirror this

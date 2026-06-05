@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-layers-base-classes/references/checklist.md
-
-
 # Review Checklist — Layers Base Class / DSL Module Specs
 
 Apply on top of the general checklist in derisk_ruby/testing-base-classes.

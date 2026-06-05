@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-query-objects/references/annotated-example.md
-
-
 # Annotated Example — Query Object
 
 Neutral domain: `Queries::IdentityScoped::ArticlesQuery` — articles visible to an identity.

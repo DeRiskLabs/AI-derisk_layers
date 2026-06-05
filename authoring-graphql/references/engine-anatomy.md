@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-graphql/references/engine-anatomy.md
-
-
 # Engine Anatomy — Base Classes, Types, and Schema Wiring
 
 The shared skeleton every endpoint builds on. Concrete mutations and resolvers are in

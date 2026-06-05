@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-graphql-mutations/references/annotated-example.md
-
-
 # Annotated Example — GraphQL Mutation
 
 Neutral domain: `createArticle`. The mutation declares; the user story behaves. The

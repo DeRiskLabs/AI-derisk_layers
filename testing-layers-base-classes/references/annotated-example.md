@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-layers-base-classes/references/annotated-example.md
-
-
 # Annotated Example — Layers Base Class / DSL Module Specs
 
 Two annotated specs: the base class (`Layers::BaseLayer`) and a DSL module

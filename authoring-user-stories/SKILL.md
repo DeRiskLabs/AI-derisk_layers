@@ -24,8 +24,6 @@ last_reviewed_at: 2026-06-05
 ---
 
 
-# common_agent_skills/derisk_layers/authoring-user-stories/SKILL.md
-
 # Authoring User Stories
 
 A user story is a `Layers::BaseLayer` subclass that orchestrates **one unit of user-facing

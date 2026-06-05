@@ -26,9 +26,6 @@ last_reviewed_at: 2026-06-04
 ---
 
 
-# common_agent_skills/derisk_layers/authoring-graphql/SKILL.md
-
-
 # Authoring GraphQL Endpoints
 
 The GraphQL layer is a **thin, declarative delivery adapter**. Mutations and resolvers

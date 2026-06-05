@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-graphql/references/checklist.md
-
-
 # Shared Checklist — GraphQL Layer
 
 

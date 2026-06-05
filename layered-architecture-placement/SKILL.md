@@ -23,8 +23,6 @@ last_reviewed_at: 2026-06-04
 ---
 
 
-# common_agent_skills/derisk_layers/layered-architecture-placement/SKILL.md
-
 # Layered Architecture and Placement
 
 This is the mental model for separating business logic from framework code, using the

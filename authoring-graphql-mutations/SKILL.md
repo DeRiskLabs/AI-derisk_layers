@@ -26,9 +26,6 @@ last_reviewed_at: 2026-06-03
 ---
 
 
-# common_agent_skills/derisk_layers/authoring-graphql-mutations/SKILL.md
-
-
 # Authoring GraphQL Mutations
 
 A mutation is a **pure declaration**: arguments in, payload out, and one line naming the

@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-graphql-queries/references/annotated-example.md
-
-
 # Annotated Example — GraphQL Query Resolvers
 
 Neutral domain: `articles` (list) and `article` (single). The resolver declares; the user

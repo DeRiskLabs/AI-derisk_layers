@@ -26,9 +26,6 @@ last_reviewed_at: 2026-06-03
 ---
 
 
-# common_agent_skills/derisk_layers/testing-use-cases/SKILL.md
-
-
 # Testing Use Cases
 
 Use this skill when writing specs for `Layers::BaseLayer` use cases (`UseCases::*`).

@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-user-stories/references/checklist.md
-
-
 # Review Checklist — User Story Specs
 
 Builds on the use-case checklist; adds the orchestration-specific items.

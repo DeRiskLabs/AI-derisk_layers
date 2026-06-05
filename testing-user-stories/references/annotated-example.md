@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-user-stories/references/annotated-example.md
-
-
 # Annotated Example — User Story Spec
 
 Neutral domain: `UserStories::Graph::Articles::Update` — find an article by uuid, authorize

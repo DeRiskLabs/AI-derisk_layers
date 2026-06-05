@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-use-cases/references/doubles-and-matchers.md
-
-
 # Doubles and Matchers — Use Cases and User Stories
 
 How to double collaborators and assert message passing in `Layers::BaseLayer` specs.

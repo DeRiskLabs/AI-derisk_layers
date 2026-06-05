@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-use-cases/references/checklist.md
-
-
 # Review Checklist — Use Case / User Story Specs
 
 Binary checks for a use-case or user-story spec before merge.

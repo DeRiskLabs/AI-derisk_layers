@@ -24,8 +24,6 @@ last_reviewed_at: 2026-06-05
 ---
 
 
-# common_agent_skills/derisk_layers/authoring-use-cases/SKILL.md
-
 # Authoring Use Cases
 
 A use case is a `Layers::BaseLayer` subclass that performs **one transactional unit of

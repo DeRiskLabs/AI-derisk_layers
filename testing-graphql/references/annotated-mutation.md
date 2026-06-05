@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-graphql/references/annotated-mutation.md
-
-
 # Annotated Example — GraphQL Mutation Acceptance Spec
 
 Neutral domain: a `createArticle` mutation. Annotated.

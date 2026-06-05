@@ -27,9 +27,6 @@ last_reviewed_at: 2026-06-03
 ---
 
 
-# common_agent_skills/derisk_layers/testing-graphql/SKILL.md
-
-
 # Testing GraphQL Acceptance Specs
 
 Use this skill for end-to-end GraphQL specs that post a document to `/graphql` and assert on

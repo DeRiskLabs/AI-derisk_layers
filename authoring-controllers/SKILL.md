@@ -26,9 +26,6 @@ last_reviewed_at: 2026-06-03
 ---
 
 
-# common_agent_skills/derisk_layers/authoring-controllers/SKILL.md
-
-
 # Authoring Controllers
 
 Controllers are **thin delivery adapters**: parse and validate the request shape, hand the

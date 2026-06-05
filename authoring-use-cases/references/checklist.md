@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/authoring-use-cases/references/checklist.md
-
-
 # Authoring Checklist — Use Cases
 
 ## Placement & shape

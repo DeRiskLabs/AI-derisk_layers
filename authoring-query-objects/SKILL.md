@@ -25,8 +25,6 @@ last_reviewed_at: 2026-06-04
 ---
 
 
-# common_agent_skills/derisk_layers/authoring-query-objects/SKILL.md
-
 # Authoring Query Objects
 
 A query object encapsulates a **scoped, composable read** of an ActiveRecord model behind a

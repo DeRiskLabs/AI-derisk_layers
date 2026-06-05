@@ -1,6 +1,3 @@
-# common_agent_skills/derisk_layers/testing-use-cases/references/annotated-example.md
-
-
 # Annotated Example — Use Case Spec
 
 Neutral domain: `UseCases::Profiles::Update` — a use case that takes a validated `form`,
