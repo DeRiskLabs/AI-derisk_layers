@@ -4,7 +4,7 @@ title: Authoring User Stories
 description: How to write a user story - a Layers::BaseLayer subclass that orchestrates one unit of user-facing behaviour (find, authorize, compose forms/use-cases/queries) and reports via success/failure. Use when adding or changing classes under a boundary's app/lib/user_stories.
 category: architecture
 status: active
-version: 1.5
+version: 1.6
 applies_to:
   - Ruby
   - Rails
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-04
+last_reviewed_at: 2026-06-05
 ---
 
 
@@ -132,8 +132,10 @@ end
 - Declarations are per-class: `required`/`optional`, `observer`, and `default_callbacks`
   apply only to the declaring class — nothing inherits. State the complete contract in
   the concrete class; keep base classes behavioural (includes, shared private helpers).
-- Report through `success(...)` / `failure(...)` only. Failures carry an `errors:` payload
-  (array of strings or an `errors` object) so the endpoint can render them.
+- Report through `success(...)` / `failure(...)` only. A failure payload always carries
+  the means to render errors: an object responding to `.errors`, or an errors collection
+  itself (e.g. `failure(errors: [...])`) — the endpoint renders without knowing what
+  failed.
 - Authorization and "does it exist" live here, not in the use case.
 - Keep `#call` a readable sequence of guards + one happy path. Push detail into private
   methods or collaborators.

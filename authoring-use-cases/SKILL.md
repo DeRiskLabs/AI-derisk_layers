@@ -4,7 +4,7 @@ title: Authoring Use Cases
 description: How to write a use-case object - a Layers::BaseLayer subclass that performs one transactional unit of work and reports via success/failure. Use when adding or changing classes under app/lib/use_cases.
 category: architecture
 status: active
-version: 1.3
+version: 1.4
 applies_to:
   - Ruby
   - Rails
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-04
+last_reviewed_at: 2026-06-05
 ---
 
 
@@ -111,6 +111,8 @@ end
   raise out of `#call` for expected failures.
 - Keep keyword payloads stable and meaningful (`success(account:)`, `failure(form:)`) — they
   are the contract the listener depends on.
+- A failure payload always carries the means to render errors: an object responding to
+  `.errors` (usually the form) or an errors collection itself.
 - Side effects (emails, jobs) belong on observers or are triggered by the caller, not buried
   in `#call`. Keep the use case focused on its transactional work.
 - No knowledge of HTTP, GraphQL, or the controller. Those live above the use case.
