@@ -4,7 +4,7 @@ title: Boundaries and Context Mapping
 description: How to decide where bounded-context boundaries go in a component-based Rails monolith, recognize a context that has overgrown or been carved too fine, and map how contexts relate. Use when splitting or merging contexts, extracting a context from the main app, or deciding what owns a new piece of domain.
 category: architecture
 status: active
-version: 1.0
+version: 1.1
 applies_to:
   - Ruby
   - Rails
@@ -120,8 +120,9 @@ The container application owns all ActiveRecord models. A context's ownership is
 
 What may cross a boundary (mechanics in [[cross-context-communication]]):
 
-- Messages to the target context's public interface, with the caller (or its
-  delegate) as listener — nothing else.
+- Messages to the target context's public interface — nothing else. Commands carry
+  the caller (or its delegate) as listener; queries return the answer directly
+  (see [[cross-context-communication]]).
 - Identities cross as uuids (or whole duck-typed objects); never another context's
   internal constants.
 - Consumers are clients: a consumer needing different behaviour requests a boundary

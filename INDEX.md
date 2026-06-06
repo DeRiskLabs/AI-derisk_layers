@@ -6,6 +6,7 @@ Using the layers gem in a Rails app. Assumes: derisk_common, derisk_ruby, derisk
 
 - [[rails-app-architecture]] — topology, request flow, where to start, the pairing rule (the hub).
 - [[boundaries-and-context-mapping]] — where bounded-context boundaries go, overgrown/over-fine smells, the context map.
+- [[cross-context-communication]] — crossing mechanics: commands (use case + listener) vs queries (side-effect-free returns).
 - [[layered-architecture-placement]] — which layer object to write and where it lives.
 
 ## Authoring

@@ -4,7 +4,7 @@ title: Authoring Components
 description: How to create and structure a component - a bounded context packaged as an unbuilt gem under components/, with a root-constant public interface and a boot-filled repository registry. Use when creating a component, deciding between component, engine, and api, or wiring a component into the container application.
 category: architecture
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -134,12 +134,15 @@ module Billing
 end
 ```
 
-- Use cases are the ports of entry to the bounded context; the root-constant methods
-  are thin pass-throughs to them.
+- The interface splits into **commands and queries** (see
+  [[cross-context-communication]]). Commands change state: use cases are their ports
+  of entry, the root-constant methods thin pass-throughs, outcomes travelling back
+  through the listener (`success`/`failure` callbacks) — a command's return value is
+  never used. Queries are side-effect-free asks returning the answer itself: an
+  enumerable (possibly empty, never nil) for collection questions, the object or nil
+  for singular ones.
 - Callers — the container, engines, other components — send only these messages.
   Nothing else in the component is public API.
-- Outcomes travel back through the listener the caller passed in (`success`/`failure`
-  callbacks), never as interrogated return values.
 - If the public methods become too many: (a) the context is probably doing too much,
   or (b) group them into collections (modules) mixed into the root constant.
 
