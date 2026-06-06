@@ -1,10 +1,10 @@
 ---
 name: rails-app-architecture
 title: Rails App Architecture (House Style)
-description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API and feature engines, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
+description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 1.4
+version: 1.5
 applies_to:
   - Ruby
   - Rails
@@ -17,10 +17,11 @@ triggers:
   - house style
   - app architecture
   - add an engine
+  - add a component
 anti_triggers:
   - non-Ruby work
 user_invocable: true
-last_reviewed_at: 2026-06-04
+last_reviewed_at: 2026-06-06
 ---
 
 
@@ -33,9 +34,15 @@ writing.
 
 ## Core Principles
 
-1. **Modular monolith.** A main app plus mountable engines: API engines (`apis/v1`,
-   `apis/graph`) and feature engines (`engines/*`). Each engine owns its controllers, views,
-   jobs, and layer objects, and defines its own base classes over the `layers` gem.
+1. **Modular monolith.** A main app plus three families of unbuilt gems, each consumed
+   through a Gemfile `path '<location>' do ... end` block: API engines (`apis/*`), feature
+   engines (`engines/*`), and components (`components/*`). Engines own their controllers,
+   views, jobs, and layer objects, and define their own base classes over the `layers`
+   gem. Components are pure-domain bounded contexts behind a root-constant public
+   interface — see [[authoring-components]]. The dividing rule: if it needs Rails
+   abstractions it is an engine (under `apis/` when it is a collection of API endpoints);
+   pure domain logic is a component. The main app owns all ActiveRecord models either
+   way; `lib/` is reserved for generic libraries that could be extracted entirely.
 2. **Thin framework edges, fat domain objects.** Controllers and GraphQL endpoints only
    translate and render. Behaviour lives in layer objects (use cases, user stories, forms,
    query objects) built on `Layers::BaseLayer` — see [[layered-architecture-placement]].
@@ -85,6 +92,8 @@ The full skill inventory lives in each collection's `INDEX.md`
 | Building… | Skill |
 | --- | --- |
 | Deciding which object / where it goes | [[layered-architecture-placement]] |
+| A pure-domain bounded context (`components/*`) | [[authoring-components]] |
+| An engine — feature slice or API home (`engines/*`, `apis/*`) | [[authoring-engines]] |
 | A REST endpoint | [[authoring-controllers]] |
 | The GraphQL layer (engine, base classes, types) | [[authoring-graphql]] |
 | A GraphQL mutation | [[authoring-graphql-mutations]] |

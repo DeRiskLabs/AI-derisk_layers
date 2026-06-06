@@ -14,6 +14,9 @@ engines/
   auth/               feature engine: controllers, views, jobs, mailers, lib/...
   collab/             feature engine
   info_vault/         feature engine
+components/
+  accounts/           pure-domain bounded context (unbuilt gem, no Rails inside)
+lib/                  generic libraries that could be extracted entirely (+ tasks, assets)
 ```
 
 - **API engines (`apis/*`)** are delivery boundaries. They expose the app over a protocol
@@ -26,8 +29,13 @@ engines/
   `Forms::V1::ProfileUpdate`) live engine-side too.
 - **Feature engines (`engines/*`)** own a bounded slice of the domain (auth, collaboration,
   info vault): their controllers/views/jobs/mailers and their own `app/lib/...` layer objects.
-- The **main app** holds shared domain not owned by a single engine: models, use cases,
-  queries, forms, and any user stories the main app itself owns.
+- **Components (`components/*`)** are pure-domain bounded contexts packaged as unbuilt
+  gems: no Rails abstractions, a root-constant public interface, persistence through a
+  boot-filled repository registry — see the authoring-components skill.
+- The **main app** holds all models, plus shared domain not owned by a single engine:
+  use cases, queries, forms, and any user stories the main app itself owns.
+- `apis/`, `engines/`, and `components/` are each consumed through Gemfile
+  `path '<location>' do ... end` blocks; nothing in them is autoloaded by the container.
 
 
 ## Base classes per boundary
@@ -37,7 +45,8 @@ Each engine/boundary defines a thin base over the `layers` gem so its objects sh
 ```
 UseCases::ApplicationUseCase        < Layers::BaseLayer     (main app use cases)
 UserStories::Graph::Base            < Layers::BaseLayer     (graph-engine user stories; + ActiveModel::Validations)
-<Engine>::BaseUserStory             < Layers::BaseLayer     (feature-engine user stories)
+UserStories::<Engine>::BaseUserStory < Layers::BaseLayer    (feature-engine user stories)
+UseCases::<Engine>::BaseUseCase     < Layers::BaseLayer     (feature-engine use cases)
 Queries::ApplicationQuery                                   (query objects; uses Paginatable)
 V1::ApplicationController           < ActionController::Base (+ ErrorHandling, Authorization)
 V1::BaseSerializer                  (include JSONAPI::Serializer)
