@@ -30,8 +30,13 @@
 - [ ] Other contexts addressed only through their public interfaces.
 
 ## Verify
-- [ ] Specs live in the container suite by type then engine
-      (`spec/use_cases/<name>/`, `spec/requests/<name>/`, …) — the engine's own
-      `spec/` stays empty.
+- [ ] Specs live in the engine, mirroring its code (`engines/<name>/spec/lib/...`,
+      `spec/requests/`, `spec/features/`), with a one-line `rails_helper` shim
+      requiring the container's.
+- [ ] Scoped run green from the app root: `bundle exec rspec engines/<name>/spec`.
+- [ ] The full suite's pattern picks up `engines/*/spec` and `apis/*/spec`.
+- [ ] No per-engine dummy app; no engine-local bundle for specs.
 - [ ] Request/feature specs cover the mounted routes; layer specs follow their
       testing skills.
+- [ ] No spec reaches into another context's internals — boundary changes are
+      requested from the owning context and tested there.

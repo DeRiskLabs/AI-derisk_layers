@@ -4,7 +4,7 @@ title: Authoring Engines
 description: How to operationally create a mountable engine - feature engines under engines/, API engines under apis/ - covering generation, namespace stance, mounting, engine-local layer bases, and spec wiring. Use when adding a new engine or bringing one to house shape.
 category: architecture
 status: active
-version: 1.0
+version: 1.1
 applies_to:
   - Ruby
   - Rails
@@ -66,8 +66,8 @@ bin/rails plugin new engines/invoicing --mountable
 
 then bring it to house shape (`references/annotated-anatomy.md` shows the target):
 
-1. Prune the generated test scaffolding and dummy app — engine code is tested through
-   the container application's suite (see Spec Wiring).
+1. Prune the generated dummy-app scaffolding — the container is the dummy app. The
+   engine keeps its own `spec/` directory (see Spec Wiring).
 2. Tighten the gemspec: the engine declares `rails` and every Rails-facing dependency
    it owns (`sidekiq`, `slim-rails`, `jsonapi-serializer`, …).
 3. Set the `engine.rb` stance for the family (feature or API — see below).
@@ -136,19 +136,39 @@ The full annotated files are in `references/annotated-anatomy.md`.
 
 ## Spec Wiring
 
-Engines do not run isolated suites — the opposite of components. Engine code is
-tested through the **container application's** suite, organized by spec type then
-engine namespace, running against the full Rails environment via `rails_helper`:
+**A bounded slice owns its specs.** The engine's specs live in the engine, mirroring
+its code, and run under the container application's environment — the container is
+the dummy app:
 
 ```text
-spec/use_cases/invoicing/...
-spec/requests/invoicing/...
-spec/features/invoicing/...
+engines/invoicing/spec/
+├── rails_helper.rb              # one line: require_relative '../../../spec/rails_helper'
+├── lib/
+│   ├── use_cases/invoicing/     # mirrors app/lib
+│   └── user_stories/invoicing/
+├── requests/                    # the engine's endpoints
+└── features/                    # journeys the engine owns
 ```
 
-The engine's own `spec/` directory stays empty. Layer objects follow their usual
-testing skills ([[testing-use-cases]], [[testing-user-stories]]); delivery follows
-[[testing-rails-requests]] (or [[testing-graphql]] for the GraphQL engine).
+- Scoped run, from the application root: `bundle exec rspec engines/invoicing/spec` —
+  green on its own, so a human+agent pair can work entirely inside the engine with
+  the whole bounded context (code and specs) in context.
+- The full suite includes every slice's specs — wire `engines/*/spec` and
+  `apis/*/spec` into the suite's pattern.
+- Engine-internal plain-Ruby code (the engine's `lib/`) is tested here too, like
+  everything the engine owns.
+- No per-engine dummy app and no engine-local bundle for specs: engines depend on the
+  container's models by doctrine, so their specs boot the container environment.
+
+Layer objects follow their usual testing skills ([[testing-use-cases]],
+[[testing-user-stories]]); delivery follows [[testing-rails-requests]] (or
+[[testing-graphql]] for the GraphQL engine).
+
+Cross-context behaviour is never tested by reaching into another context. Boundaries
+are hard and tested where they live; a consumer needing different behaviour requests
+a boundary change from the context's owner (even when that is the same person), and
+the grown boundary is tested on its own side. Crossings are validated at delivery
+level: the request/acceptance specs of the interaction's owner.
 
 
 ## Rules
@@ -170,7 +190,10 @@ testing skills ([[testing-use-cases]], [[testing-user-stories]]); delivery follo
   component ([[authoring-components]]).
 - Skipping `isolate_namespace`.
 - Engine-local models or migrations.
-- An engine-local isolated spec suite or dummy app.
+- A per-engine dummy app or an engine-local bundle for specs — specs live in the
+  engine but boot the container environment.
+- Testing another context's internals from the engine — request a boundary change
+  instead.
 - Namespacing layer objects under the engine constant (`Invoicing::UseCases::...`) —
   they belong to the app-wide families (`UseCases::Invoicing::...`).
 - Leaving the engine's session middleware in place in a feature engine (duplicate

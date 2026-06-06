@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 1.5
+version: 1.6
 applies_to:
   - Ruby
   - Rails
@@ -60,7 +60,10 @@ writing.
    external identifier — in paths, payloads, and lookups; the numeric `id` stays internal
    (and stays the primary key).
 6. **Tested in one disciplined style.** RSpec + `always_execute`, one assertion per example —
-   see [[ruby-testing]] and the testing skills below.
+   see [[ruby-testing]] and the testing skills below. A bounded slice owns its specs:
+   engine and api specs live in the slice and run under the container environment;
+   component specs run standalone. Cross-context behaviour is tested at the boundary
+   contract, never by reaching into another context.
 
 
 ## Required Reading

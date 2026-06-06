@@ -4,7 +4,7 @@ title: Authoring Components
 description: How to create and structure a component - a bounded context packaged as an unbuilt gem under components/, with a root-constant public interface and a boot-filled repository registry. Use when creating a component, deciding between component, engine, and api, or wiring a component into the container application.
 category: architecture
 status: active
-version: 1.0
+version: 1.1
 applies_to:
   - Ruby
   - Rails
@@ -228,6 +228,10 @@ follow [[authoring-engines]]:
   interface, passing itself (or a delegate) as listener.
 - A use case never calls a user story: user stories belong to delivery boundaries
   (the app, engines, apis), and a component has none.
+- Consumers are clients: a consumer needing different behaviour from this component
+  requests a boundary change from its owner (even when that is the same person) —
+  the public interface grows, tested on the component's side. No consumer tests or
+  reaches into the component's internals.
 
 
 ## Testing
