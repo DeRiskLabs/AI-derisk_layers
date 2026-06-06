@@ -4,7 +4,7 @@ title: Authoring Engines
 description: How to operationally create a mountable engine - feature engines under engines/, API engines under apis/ - covering generation, namespace stance, mounting, engine-local layer bases, and spec wiring. Use when adding a new engine or bringing one to house shape.
 category: architecture
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -142,19 +142,23 @@ the dummy app:
 
 ```text
 engines/invoicing/spec/
-├── rails_helper.rb              # one line: require_relative '../../../spec/rails_helper'
-├── lib/
-│   ├── use_cases/invoicing/     # mirrors app/lib
-│   └── user_stories/invoicing/
+├── use_cases/invoicing/         # the engine's layer objects
+├── user_stories/invoicing/
 ├── requests/                    # the engine's endpoints
 └── features/                    # journeys the engine owns
 ```
 
+- Engine spec files open with `require 'rails_helper'` like any other — the
+  application's `spec/` directory is on RSpec's load path, so the container's
+  `rails_helper` resolves from anywhere; no per-engine helper shim is needed. The
+  application's `.rspec` carries `--require rails_helper`.
 - Scoped run, from the application root: `bundle exec rspec engines/invoicing/spec` —
   green on its own, so a human+agent pair can work entirely inside the engine with
   the whole bounded context (code and specs) in context.
-- The full suite includes every slice's specs — wire `engines/*/spec` and
-  `apis/*/spec` into the suite's pattern.
+- The full suite runs every slice: a `bin/test_suite` at the application root invokes
+  `bundle exec rspec spec apis/*/spec engines/*/spec`. (Do not bake slice paths into
+  `.rspec` as `--pattern` — patterns glob from the root even in scoped runs, which
+  breaks per-slice scoping.)
 - Engine-internal plain-Ruby code (the engine's `lib/`) is tested here too, like
   everything the engine owns.
 - No per-engine dummy app and no engine-local bundle for specs: engines depend on the

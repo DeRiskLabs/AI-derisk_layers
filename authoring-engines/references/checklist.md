@@ -30,11 +30,12 @@
 - [ ] Other contexts addressed only through their public interfaces.
 
 ## Verify
-- [ ] Specs live in the engine, mirroring its code (`engines/<name>/spec/lib/...`,
-      `spec/requests/`, `spec/features/`), with a one-line `rails_helper` shim
-      requiring the container's.
+- [ ] Specs live in the engine, mirroring its code (`engines/<name>/spec/use_cases/`,
+      `spec/requests/`, `spec/features/`); files `require 'rails_helper'` — the
+      container's resolves via the load path, no shim.
 - [ ] Scoped run green from the app root: `bundle exec rspec engines/<name>/spec`.
-- [ ] The full suite's pattern picks up `engines/*/spec` and `apis/*/spec`.
+- [ ] `bin/test_suite` runs `spec apis/*/spec engines/*/spec` (no slice paths in
+      `.rspec` patterns — they break scoped runs).
 - [ ] No per-engine dummy app; no engine-local bundle for specs.
 - [ ] Request/feature specs cover the mounted routes; layer specs follow their
       testing skills.
