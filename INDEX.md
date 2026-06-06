@@ -5,6 +5,7 @@ Using the layers gem in a Rails app. Assumes: derisk_common, derisk_ruby, derisk
 ## Architecture (read first)
 
 - [[rails-app-architecture]] — topology, request flow, where to start, the pairing rule (the hub).
+- [[boundaries-and-context-mapping]] — where bounded-context boundaries go, overgrown/over-fine smells, the context map.
 - [[layered-architecture-placement]] — which layer object to write and where it lives.
 
 ## Authoring

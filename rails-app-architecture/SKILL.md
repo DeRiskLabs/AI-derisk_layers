@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 1.6
+version: 1.7
 applies_to:
   - Ruby
   - Rails
@@ -94,6 +94,7 @@ The full skill inventory lives in each collection's `INDEX.md`
 
 | Building… | Skill |
 | --- | --- |
+| Deciding where a boundary goes / splitting a context | [[boundaries-and-context-mapping]] |
 | Deciding which object / where it goes | [[layered-architecture-placement]] |
 | A pure-domain bounded context (`components/*`) | [[authoring-components]] |
 | An engine — feature slice or API home (`engines/*`, `apis/*`) | [[authoring-engines]] |
