@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 1.8
+version: 1.9
 applies_to:
   - Ruby
   - Rails
@@ -110,6 +110,10 @@ The full skill inventory lives in each collection's `INDEX.md`
 | A scoped read | [[authoring-query-objects]] |
 | A model | [[authoring-models]] |
 | A JSON:API response | [[authoring-serializers]] |
+| A background job | [[authoring-layers-jobs]] (over [[authoring-jobs]]) |
+| A mailer | [[authoring-mailers]] |
+| A rake task | [[authoring-rake-tasks]] |
+| Endpoint auth / a permission check | [[api-authentication-authorization]] |
 
 
 ## The Pairing Rule
@@ -124,6 +128,7 @@ Every authoring skill has a testing counterpart — write both, always:
 | use cases | [[testing-use-cases]] |
 | form objects | [[testing-form-objects]] |
 | query objects | [[testing-query-objects]] |
+| jobs | [[testing-jobs]] |
 | models | [[testing-models]] (+ [[testing-factories]], [[testing-routing]]) |
 | base classes / mixins | [[testing-layers-base-classes]] |
 

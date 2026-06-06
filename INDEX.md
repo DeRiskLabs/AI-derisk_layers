@@ -20,6 +20,8 @@ Using the layers gem in a Rails app. Assumes: derisk_common, derisk_ruby, derisk
 - [[authoring-graphql]] — GraphQL layer hub: engine anatomy, base classes, types, wiring.
 - [[authoring-graphql-mutations]] — declarative mutations via `user_story` / `user_story_arg`.
 - [[authoring-graphql-queries]] — declarative query resolvers; scoping in the user story.
+- [[authoring-layers-jobs]] — the layers overlay on jobs: Layers::BaseJob, JobFailed retry mapping, fire_and_forget.
+- [[api-authentication-authorization]] — authentication at the engine edge; authorization as identity scoping in user stories.
 
 ## Testing
 
