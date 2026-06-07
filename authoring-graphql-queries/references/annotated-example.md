@@ -80,7 +80,8 @@ end
 ## The User Stories They Run
 
 Compact — authored per [[authoring-user-stories]]. **Scoping lives here**, driven by
-`current_identity`:
+`current_identity`, and the lookup goes through the engine's injected query-object
+registry — engine code never names container constants (doctrine ruling 15):
 
 ```ruby
 # frozen_string_literal: true
@@ -91,10 +92,21 @@ module UserStories
       class FetchAll < UserStories::Graph::Base
         required :current_identity
 
-        def call
-          articles = Article.where(author: current_identity)
+        emits success: [:articles], failure: [:errors]
 
+        def call
           success(articles: articles)
+        end
+
+
+        private
+
+        def articles
+          articles_query.new(identity: current_identity).all
+        end
+
+        def articles_query
+          Graph.configuration.queries[:articles]
         end
       end
     end
@@ -112,20 +124,33 @@ module UserStories
         required :current_identity
         required :id
 
-        def call
-          article = Article.where(author: current_identity).find_by(uuid: id)
+        emits success: [:article], failure: [:errors]
 
-          if article
-            success(article: article)
-          else
-            failure(errors: [StandardError.new('Article not found')])
-          end
+        def call
+          success(article: article)
+        end
+
+
+        private
+
+        def article
+          articles_query.new(identity: current_identity).find_by(uuid: id)
+        end
+
+        def articles_query
+          Graph.configuration.queries[:articles]
         end
       end
     end
   end
 end
 ```
+
+Absence is not failure at a query boundary: the single fetch emits
+`success(article: nil)` for a record outside the identity's reach, and the resolver's
+`null: true` type renders it. The container binds the registry in
+`config/initializers/graph.rb`:
+`config.register_query_object articles: 'Queries::ArticlesQuery'`.
 
 
 ## Wiring

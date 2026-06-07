@@ -9,8 +9,11 @@
 
 ## #call orchestration
 - [ ] Reads as a sequence of guard clauses + one happy path.
-- [ ] Find step looks up by public uuid and guards missing records with `failure(errors: [...])`.
-- [ ] Authorization step guards unauthorized actors with `failure(errors: [...])`.
+- [ ] Find step looks up by public uuid through an identity-scoped query and guards
+      missing records with `failure(errors: [...])` — off-limits records look absent
+      (authorization is reach, not flags; no "not authorized" oracle).
+- [ ] Engine-resident stories resolve use cases / query objects from the engine's
+      registries — no static container-constant references.
 - [ ] Reports via `success(<named_object>:)` / `failure(errors:)` — never returns a value,
       never a generic `result` key.
 - [ ] Transactional writes delegated to a use case; complex reads to a query object.
@@ -21,5 +24,5 @@
 - [ ] Detail pushed into private methods or collaborators.
 
 ## Verify
-- [ ] Spec following [[testing-user-stories]] covers success, validation failure, not-found,
-      and not-authorized.
+- [ ] Spec following [[testing-user-stories]] covers success, validation failure, and
+      not-found (which covers off-limits records).

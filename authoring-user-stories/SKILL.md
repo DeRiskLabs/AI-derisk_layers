@@ -4,7 +4,7 @@ title: Authoring User Stories
 description: How to write a user story - a Layers::BaseLayer subclass that orchestrates one unit of user-facing behaviour (find, authorize, compose forms/use-cases/queries) and reports via success/failure. Use when adding or changing classes under a boundary's app/lib/user_stories.
 category: architecture
 status: active
-version: 1.7
+version: 2.0
 applies_to:
   - Ruby
   - Rails
@@ -82,11 +82,16 @@ generator scaffolds; fill the generated TODOs.
 1. Inherit from the relevant base (`UserStories::Graph::Base` / `<Engine>::BaseUserStory`).
 2. Declare inputs with `required` / `optional` (e.g. `required :current_identity, :id`).
 3. Implement `#call` as an orchestration with explicit guard clauses:
-   - find the record(s); `return failure(errors: ['... not found']) unless record`
-   - authorize; `return failure(errors: ['Not authorized ...']) unless authorized?(record)`
-   - perform the work (often by delegating to a use case or query object)
+   - find the record(s) through an **identity-scoped lookup** — authorization is reach,
+     not flags: records outside the identity's scope are simply not found
+   - `return failure(errors: ['... not found']) unless record`
+   - perform the work by delegating to a use case as listener
    - `success(article: article)` / `failure(errors: article.errors)` — the success payload
      key **names the object it carries**; there is no such thing as a "result"
+4. A story in an **engine** resolves its use cases and query objects from the engine's
+   injected registries (doctrine ruling 15) — engine code never names container
+   constants. A story in the **container app** may name `UseCases::*` / `Queries::*`
+   directly: AR and its collaborators live there.
 
 ```ruby
 module UserStories
@@ -98,25 +103,38 @@ module UserStories
         optional :title
 
         def call
-          article = Article.find_by(uuid: id)
           return failure(errors: ['Article not found']) unless article
-          return failure(errors: ['Not authorized to update this article']) unless authorized?(article)
 
-          if article.update(update_attributes)
-            success(article: article)
-          else
-            failure(errors: article.errors)
-          end
+          update_article.call(
+            article: article,
+            title: title,
+            listener: self,
+            on_success: :update_succeeded,
+            on_failure: :update_failed,
+          )
         end
+
+        def update_succeeded(article:)
+          success(article: article)
+        end
+
+        def update_failed(form: nil, errors: nil)
+          failure(errors: errors || form.errors)
+        end
+
 
         private
 
-        def authorized?(article)
-          article.author == current_identity
+        def article
+          @article ||= articles_query.new(identity: current_identity).find_by(uuid: id)
         end
 
-        def update_attributes
-          {}.tap { |a| a[:title] = title if title.present? }
+        def articles_query
+          Graph.configuration.queries[:articles]
+        end
+
+        def update_article
+          Graph.configuration.use_cases[:update_article]
         end
       end
     end
@@ -139,7 +157,9 @@ end
   the means to render errors: an object responding to `.errors`, or an errors collection
   itself (e.g. `failure(errors: [...])`) — the endpoint renders without knowing what
   failed.
-- Authorization and "does it exist" live here, not in the use case.
+- Authorization and "does it exist" live here, not in the use case — and authorization
+  is identity scoping of the lookup (reach, not flags): off-limits records are
+  not-found, never a "not authorized" oracle ([[api-authentication-authorization]]).
 - Keep `#call` a readable sequence of guards + one happy path. Push detail into private
   methods or collaborators.
 - No HTTP/GraphQL response shaping — that is the endpoint's job (the user story is the
@@ -153,3 +173,6 @@ end
 - returning values instead of sending `success`/`failure`.
 - a generic `result` payload key — payloads carry **named objects or errors**. Result-speak
   seeds Result-object patterns, which metastasize through a codebase.
+- static references to container constants from an engine-resident story — resolve
+  through the engine's registries; one static host reference breaks the engine's
+  standalone suite ([[authoring-engines]]).

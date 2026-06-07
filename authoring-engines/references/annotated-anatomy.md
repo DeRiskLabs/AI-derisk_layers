@@ -9,9 +9,10 @@ feature engine `invoicing`; the API-engine variants follow.
 ```text
 engines/invoicing/
 ├── invoicing.gemspec
-├── Gemfile                      # gemspec + dev tooling; the container consumes via path
+├── Gemfile                      # gemspec + layers git pin + rspec-rails/always_execute
 ├── Rakefile
 ├── README.md
+├── .rspec                       # --require rails_helper
 ├── app/
 │   ├── controllers/invoicing/   # engine-namespaced: Invoicing::ProfilesController
 │   ├── views/invoicing/
@@ -24,11 +25,19 @@ engines/invoicing/
 ├── config/
 │   ├── routes.rb
 │   └── locales/
-└── lib/
-    ├── invoicing.rb             # requires version + engine
-    └── invoicing/
-        ├── version.rb
-        └── engine.rb
+├── lib/
+│   ├── invoicing.rb             # requires layers, registries, configuration, engine
+│   └── invoicing/
+│       ├── version.rb
+│       ├── engine.rb
+│       ├── use_case_registry.rb
+│       ├── query_object_registry.rb
+│       └── configuration.rb
+└── spec/
+    ├── spec_helper.rb
+    ├── rails_helper.rb          # boots spec/dummy
+    ├── invoicing_spec.rb        # generated root spec: registries present
+    └── dummy/config/            # schema-less dummy: application.rb, environment.rb, routes.rb
 ```
 
 
@@ -49,6 +58,7 @@ Gem::Specification.new do |spec|
     Dir['{app,config,db,lib}/**/*', 'Rakefile', 'README.md']
   end
 
+  spec.add_dependency 'layers'
   spec.add_dependency 'rails', '>= 8.0.1'
   spec.add_dependency 'sidekiq'
   spec.add_dependency 'slim-rails'
@@ -64,14 +74,115 @@ consumed from the path, never built or published.
 ```ruby
 # frozen_string_literal: true
 
+require 'layers'
 require 'invoicing/version'
+require 'invoicing/use_case_registry'
+require 'invoicing/query_object_registry'
+require 'invoicing/configuration'
 require 'invoicing/engine'
 
 module Invoicing
+  class << self
+    def configuration
+      @configuration ||= Configuration.new
+    end
+
+    def configure
+      yield(configuration)
+    end
+  end
 end
 ```
 
 The engine's `app/` directories are autoloaded by Rails; only `lib/` needs requires.
+
+
+## The injected registries
+
+```ruby
+# lib/invoicing/use_case_registry.rb
+module Invoicing
+  class UseCaseRegistry < Layers::BaseRegistry
+    alias register_use_case register
+    alias register_use_cases register
+    alias remove_use_case remove
+  end
+end
+```
+
+```ruby
+# lib/invoicing/query_object_registry.rb
+module Invoicing
+  class QueryObjectRegistry < Layers::BaseRegistry
+    alias register_query_object register
+    alias register_query_objects register
+    alias remove_query_object remove
+  end
+end
+```
+
+```ruby
+# lib/invoicing/configuration.rb
+module Invoicing
+  class Configuration
+    attr_writer :use_cases, :queries
+
+    delegate :register_use_case, :register_use_cases, to: :use_cases
+    delegate :register_query_object, :register_query_objects, to: :queries
+
+    def use_cases
+      @use_cases ||= UseCaseRegistry.new
+    end
+
+    def queries
+      @queries ||= QueryObjectRegistry.new
+    end
+  end
+end
+```
+
+The container binds them in the engine's initializer — the only place container
+constants are named:
+
+```ruby
+# config/initializers/invoicing.rb (container application)
+Invoicing.configure do |config|
+  config.register_use_case create_invoice: 'UseCases::Invoices::Create'
+  config.register_query_object invoices: 'Queries::InvoicesQuery'
+end
+```
+
+Strings only, constantized per access — registering a class that does not exist yet
+is safe. Engine code resolves `Invoicing.configuration.use_cases[:create_invoice]` /
+`.queries[:invoices]`; engine specs swap whole registries for fakes
+(`Invoicing.configuration.use_cases = { create_invoice: fake }`).
+
+
+## The schema-less dummy app
+
+```ruby
+# spec/dummy/config/application.rb
+require 'action_controller/railtie'
+require 'invoicing'
+
+module Dummy
+  class Application < Rails::Application
+    config.root = File.expand_path('..', __dir__)
+    config.load_defaults Rails::VERSION::STRING.to_f
+    config.eager_load = false
+    config.hosts.clear
+    config.secret_key_base = 'dummy'
+    config.session_store :cookie_store, key: '_dummy_session'
+  end
+end
+```
+
+API engines swap the session-store line for `config.api_only = true`. The explicit
+`config.root` is load-bearing: without it Rails walks up to the nearest `config.ru` —
+the container — and boots the container's initializers into the dummy. No database,
+no models, no migrations: AR is mocked at the registry boundary, and the AR objects
+are thoroughly tested in the container. `spec/dummy/config/routes.rb` mounts the
+engine; `environment.rb` is the standard two-liner.
 
 
 ## lib/invoicing/engine.rb — feature-engine stance

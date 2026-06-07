@@ -4,7 +4,7 @@ title: Testing User Stories
 description: Spec pattern for Layers user stories (UserStories::*) - orchestration objects that compose forms, use cases, and queries and report via listener callbacks. Use when writing or modifying specs under spec/user_stories.
 category: testing
 status: active
-version: 1.2
+version: 2.0
 applies_to:
   - Ruby
   - Rails
@@ -65,7 +65,8 @@ what is specific to user stories.
 ## What Is Specific to User Stories
 
 1. **Orchestration paths, not just CRUD.** Cover each branch the story can take: success,
-   validation failure, not-found, not-authorized, and "belongs to another user".
+   validation failure, not-found (which includes out-of-reach records — authorization is
+   identity scoping, so off-limits looks like absence).
 
 2. **Inputs are public identifiers.** Stories are driven by delivery adapters, so lookup
    inputs are uuids (`id: article.uuid`); the not-found branch overrides with a random
@@ -83,11 +84,32 @@ what is specific to user stories.
 
 3. **Failures carry an `errors` array.** User stories typically report
    `failure(errors: [...])` or `failure(errors: model.errors)`. Assert the listener was
-   notified, and (separately) that the error content is right by reading the model the story
-   acted on — not via undefined spy helpers.
+   notified, and (separately) that the error content is right by reading the object the
+   story acted on — not via undefined spy helpers.
 
-4. **Integration style is common.** Because stories touch several collaborators and the DB,
-   `FactoryBot.create` + `reload` reads cleanly:
+4. **Engine stories test against registry fakes — no database.** An engine's suite runs
+   standalone against a schema-less dummy app ([[authoring-engines]]): no factories, no
+   AR. Swap whole registries for fakes (anything answering `[]` serves) and assert the
+   outgoing messages:
+
+   ```ruby
+   let(:update_use_case) { class_spy('UseCases::Articles::Update') }
+   let(:articles_query)  { class_double('Queries::ArticlesQuery', new: query_instance) }
+   let(:query_instance)  { instance_double('Queries::ArticlesQuery', find_by: article) }
+   let(:article)         { instance_double('Article', uuid: id) }
+
+   before do
+     Graph.configuration.use_cases = { update_article: update_use_case }
+     Graph.configuration.queries = { articles: articles_query }
+   end
+   ```
+
+   Aftermath assertions become outgoing-command assertions
+   (`expect(update_use_case).to have_received(:call).with(hash_including(article: article))`);
+   the real binding is proven by the container's delivery-level acceptance specs.
+
+5. **Container stories may use the database.** A story living in the container app touches
+   real collaborators, so `FactoryBot.create` + `reload` reads cleanly there:
 
    ```ruby
    context 'when successful' do
@@ -102,7 +124,7 @@ what is specific to user stories.
    end
    ```
 
-5. **Composed use cases / queries can be mocked.** When a story delegates to a use case, stub
+6. **Composed use cases / queries can be mocked.** When a story delegates to a use case, stub
    its constructor and assert the message, exactly as in [[testing-use-cases]].
 
 
@@ -115,14 +137,14 @@ what is specific to user stories.
 - multiple expectations per `it`; setup or `#call` inside an `it`.
 
 
-## Preferred Structure
+## Preferred Structure (container-resident story; engine stories swap registries — see §4)
 
 ```ruby
 # frozen_string_literal: true
 
 require 'rails_helper'
 
-RSpec.describe UserStories::Graph::Articles::Update do
+RSpec.describe UserStories::Articles::Update do
   subject(:user_story) { described_class.new(**params) }
 
   let(:listener) { instance_spy('Listener') }
@@ -154,7 +176,7 @@ RSpec.describe UserStories::Graph::Articles::Update do
       end
     end
 
-    context 'when the article belongs to another identity' do
+    context 'when the article is out of reach' do
       let(:article) { FactoryBot.create(:article, author: FactoryBot.create(:identity)) }
 
       it 'notifies the listener of failure' do
@@ -164,3 +186,6 @@ RSpec.describe UserStories::Graph::Articles::Update do
   end
 end
 ```
+
+The full registry-fake pattern for engine-resident stories is the annotated example in
+`references/annotated-example.md`.

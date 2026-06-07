@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 1.9
+version: 2.0
 applies_to:
   - Ruby
   - Rails
@@ -21,7 +21,7 @@ triggers:
 anti_triggers:
   - non-Ruby work
 user_invocable: true
-last_reviewed_at: 2026-06-06
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -38,11 +38,14 @@ writing.
    through a Gemfile `path '<location>' do ... end` block: API engines (`apis/*`), feature
    engines (`engines/*`), and components (`components/*`). Engines own their controllers,
    views, jobs, and layer objects, and define their own base classes over the `layers`
-   gem. Components are pure-domain bounded contexts behind a root-constant public
-   interface — see [[authoring-components]]. The dividing rule: if it needs Rails
-   abstractions it is an engine (under `apis/` when it is a collection of API endpoints);
-   pure domain logic is a component. The main app owns all ActiveRecord models either
-   way; `lib/` is reserved for generic libraries that could be extracted entirely.
+   gem; they never touch ActiveRecord directly — domain behaviour is injected through
+   use-case and query-object registries the container binds in an initializer
+   ([[authoring-engines]]). Components are pure-domain bounded contexts behind a
+   root-constant public interface — see [[authoring-components]]. The dividing rule: if
+   it needs Rails abstractions it is an engine (under `apis/` when it is a collection of
+   API endpoints); pure domain logic is a component. The main app owns all ActiveRecord
+   models either way; `lib/` is reserved for generic libraries that could be extracted
+   entirely.
 2. **Thin framework edges, fat domain objects.** Controllers and GraphQL endpoints only
    translate and render. Behaviour lives in layer objects (use cases, user stories, forms,
    query objects) built on `Layers::BaseLayer` — see [[layered-architecture-placement]].
@@ -62,10 +65,12 @@ writing.
    external identifier — in paths, payloads, and lookups; the numeric `id` stays internal
    (and stays the primary key).
 6. **Tested in one disciplined style.** RSpec + `always_execute`, one assertion per example —
-   see [[ruby-testing]] and the testing skills below. A bounded slice owns its specs:
-   engine and api specs live in the slice and run under the container environment;
-   component specs run standalone. Cross-context behaviour is tested at the boundary
-   contract, never by reaching into another context.
+   see [[ruby-testing]] and the testing skills below. A bounded slice owns its specs and
+   runs them standalone in its own directory: components with no Rails at all; engines
+   and apis against a schema-less dummy app with their registries swapped for fakes.
+   `bin/test_suite` walks the container suite plus every slice; real crossings are
+   validated at delivery level in the container suite. Cross-context behaviour is
+   tested at the boundary contract, never by reaching into another context.
 
 
 ## Required Reading
