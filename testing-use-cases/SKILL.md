@@ -4,7 +4,7 @@ title: Testing Use Cases
 description: Spec pattern for testing Layers::BaseLayer use cases (UseCases::*) that communicate by message passing to a listener. User stories share these mechanics - see testing-user-stories. Use when writing or modifying specs for classes under app/lib/use_cases.
 category: testing
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
