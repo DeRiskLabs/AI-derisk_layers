@@ -4,7 +4,7 @@ title: Layered Architecture and Placement
 description: The mental model for the layer abstractions (user stories, use cases, query objects, form objects), what each is responsible for, how they collaborate, and where each file lives. Load when deciding which abstraction to write or where to put it.
 category: architecture
 status: active
-version: 1.5
+version: 1.6
 applies_to:
   - Ruby
   - Rails
@@ -136,4 +136,5 @@ bin/rails generate layers:query_object <name>
 bin/rails generate layers:graphql_mutation <domain>/<action>   # --engine <name>
 bin/rails generate layers:graphql_query <domain>               # --single for one record
 bin/rails generate layers:component <name>
+bin/rails generate layers:engine <name>                        # --family api for apis/
 ```

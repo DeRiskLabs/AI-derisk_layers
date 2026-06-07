@@ -4,7 +4,7 @@ title: Authoring Engines
 description: How to operationally create a mountable engine - feature engines under engines/, API engines under apis/ - covering generation, namespace stance, mounting, engine-local layer bases, and spec wiring. Use when adding a new engine or bringing one to house shape.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -21,7 +21,7 @@ anti_triggers:
   - pure domain context (component)
   - a single endpoint in an existing engine
 user_invocable: true
-last_reviewed_at: 2026-06-06
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -61,17 +61,22 @@ For the GraphQL engine's internals (types, base endpoint classes, schema wiring)
 ## Creating One
 
 ```bash
-bin/rails plugin new engines/invoicing --mountable
+bin/rails generate layers:engine invoicing                # feature engine, engines/
+bin/rails generate layers:engine v2 --family api          # api engine, apis/
 ```
 
-then bring it to house shape (`references/annotated-anatomy.md` shows the target):
+Never hand-create the shell — the generator emits the house shape directly
+(`references/annotated-anatomy.md` shows the target): gemspec, `engine.rb` in the
+family stance, routes skeleton, engine-namespaced `ApplicationController`,
+engine-local layer bases, a `spec/` home, the container Gemfile `path` entry, and the
+mount line. Run `bundle install` after generating (the Gemfile gained a path gem),
+then fill the TODOs.
 
-1. Prune the generated dummy-app scaffolding — the container is the dummy app. The
-   engine keeps its own `spec/` directory (see Spec Wiring).
-2. Tighten the gemspec: the engine declares `rails` and every Rails-facing dependency
-   it owns (`sidekiq`, `slim-rails`, `jsonapi-serializer`, …).
-3. Set the `engine.rb` stance for the family (feature or API — see below).
-4. Consume it from the container's Gemfile `path` block and mount it:
+After generating:
+
+1. Add every Rails-facing dependency the engine owns to its gemspec (`sidekiq`,
+   `slim-rails`, `jsonapi-serializer`, …).
+2. Confirm the container wiring the generator injected:
 
 ```ruby
 path 'engines' do
