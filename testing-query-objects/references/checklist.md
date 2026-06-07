@@ -11,7 +11,7 @@
 
 ## Boundary coverage
 
-- [ ] Scoping: in-scope AND out-of-scope records; `contain_exactly` on the result.
+- [ ] Scoping: in-scope AND out-of-scope records; `contain_exactly` on the returned collection.
 - [ ] Empty case: out-of-scope records exist, result is empty.
 - [ ] Every composed `where`/`join` condition has a context with a record failing exactly
       that condition.
@@ -23,8 +23,8 @@
   - [ ] identity: returns the object under test (`expect(...).to be(query)`).
   - [ ] mutation: the relation received the intended message (spy via the `relation:`
         option + `have_received`), or the DB-backed result reflects it.
-- [ ] `order` applies the sort (assert first/last of the result).
-- [ ] `page`/`per` limit the result.
+- [ ] `order` applies the sort (assert first/last of the returned collection).
+- [ ] `page`/`per` limit the returned collection.
 - [ ] `per` before `page` raises `PaginationError` (block expectation).
 
 

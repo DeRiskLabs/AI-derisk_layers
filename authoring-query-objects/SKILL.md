@@ -4,7 +4,7 @@ title: Authoring Query Objects
 description: How to write a query object - a class that encapsulates a scoped, composable ActiveRecord query behind a small interface. Use when adding or changing classes under app/lib/queries.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -21,7 +21,7 @@ anti_triggers:
   - user story
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-04
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -55,6 +55,9 @@ Scopes group queries by the boundary they enforce, e.g. `IdentityScoped`, `FirmS
 base `ApplicationQuery` sits at `app/lib/queries/application_query.rb`. (`ApplicationQuery` is
 the app's richer evolution of the gem's `Layers::BaseQueryObject` — same shape: a default
 relation class, delegated AR methods, an `order`, and a `Paginatable` concern.)
+
+Scaffold the object + spec pair with `bin/rails generate layers:query_object <name>` —
+never hand-create files a generator scaffolds; fill the generated TODOs.
 
 
 ## The Core Contract: Chainable

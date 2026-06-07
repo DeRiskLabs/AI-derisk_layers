@@ -4,7 +4,7 @@ title: Authoring GraphQL Mutations
 description: How to write a declarative GraphQL mutation - an ApplicationMutation subclass that declares arguments, a payload, and the user story to run via the layers gem's user_story DSL. Use when adding or changing files under apis/graph/app/graphql/graph/mutations.
 category: architecture
 status: active
-version: 1.0
+version: 1.1
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - rest controller
   - use case internals
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -48,6 +48,11 @@ references/checklist.md           # authoring checklist
 ```
 
 Test with [[testing-graphql]] — acceptance specs only.
+
+Scaffold the mutation + engine-local user story + pending acceptance spec with
+`bin/rails generate layers:graphql_mutation <domain>/<action>` (`--engine <name>` for a
+non-default engine) — never hand-create files a generator scaffolds; fill the generated
+TODOs.
 
 
 ## Anatomy

@@ -27,7 +27,7 @@ module UserStories
           return failure(errors: ['Not authorized to update this article']) unless authorized?(article)
 
           if article.update(update_attributes)
-            success(result: article)
+            success(article: article)
           else
             failure(errors: article.errors)
           end
@@ -93,7 +93,7 @@ RSpec.describe UserStories::Graph::Articles::Update do
       end
 
       it 'notifies the listener of success' do
-        expect(listener).to have_received(on_success_callback).with(result: article)
+        expect(listener).to have_received(on_success_callback).with(article: article)
       end
     end
 

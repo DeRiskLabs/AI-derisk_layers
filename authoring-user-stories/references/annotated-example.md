@@ -27,7 +27,7 @@ module UserStories
           # 3. Do the work. Here it is a simple update; for anything transactional or
           #    reused, delegate to a use case instead.
           if article.update(update_attributes)
-            success(result: article)
+            success(article: article)
           else
             failure(errors: article.errors)   # validation errors flow back as the errors payload
           end

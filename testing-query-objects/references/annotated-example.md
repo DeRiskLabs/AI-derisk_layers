@@ -185,7 +185,7 @@ end
 - **One context per composed condition.** Each `where`/`join` earns a record that fails
   exactly that condition, so a regression in any branch fails exactly one context.
 - **`execute(:results)`.** The query call is the action under test; the named let keeps
-  examples reading as assertions on the result (incoming query → assert the return value).
+  examples reading as assertions on the returned collection (incoming query → assert the return value).
 - **The raising contract via block expectation** — `per` before `page` is part of the
   public interface and gets pinned like any other behaviour.
 - **Refiners prove both halves of their contract.** Identity (`be(query)` — the chain

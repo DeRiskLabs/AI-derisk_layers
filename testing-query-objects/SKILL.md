@@ -4,7 +4,7 @@ title: Testing Query Objects
 description: Spec pattern for query objects (Queries::*) - DB-backed specs that pin the scoping boundary, the empty case, each composed condition, and the chainable interface. Use when writing or modifying specs under spec/lib/queries.
 category: testing
 status: active
-version: 1.0
+version: 1.1
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - use case spec
   - request spec
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-07
 ---
 
 

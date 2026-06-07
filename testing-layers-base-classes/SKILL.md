@@ -4,7 +4,7 @@ title: Testing Layers Base Classes
 description: Spec patterns for the Layers::BaseLayer family - composition pins for the DSL mixins, constructor contracts (null listener, callback defaults, inputs validation), success/failure reporting through concrete subclasses, app base classes over the gem, and Graphql::BaseEndpoint. Use when testing the layers gem's own base classes and mixins, or an app base class built on them.
 category: testing
 status: active
-version: 1.0
+version: 1.1
 applies_to:
   - Ruby
   - RSpec
@@ -24,7 +24,7 @@ anti_triggers:
   - model spec
   - request spec
 user_invocable: true
-last_reviewed_at: 2026-06-04
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -105,7 +105,7 @@ let(:success_class) do
     observer -> { recorder << :success }, of_event: :success
 
     def call
-      success(result: true)
+      success(processed: true)
     end
   end
 end
@@ -119,7 +119,7 @@ it 'notifies success observers' do
 end
 
 it 'calls the success callback on the listener' do
-  expect(listener).to have_received(:on_success).with(result: true)
+  expect(listener).to have_received(:on_success).with(processed: true)
 end
 ```
 

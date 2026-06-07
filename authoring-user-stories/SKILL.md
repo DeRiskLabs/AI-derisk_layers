@@ -4,7 +4,7 @@ title: Authoring User Stories
 description: How to write a user story - a Layers::BaseLayer subclass that orchestrates one unit of user-facing behaviour (find, authorize, compose forms/use-cases/queries) and reports via success/failure. Use when adding or changing classes under a boundary's app/lib/user_stories.
 category: architecture
 status: active
-version: 1.6
+version: 1.7
 applies_to:
   - Ruby
   - Rails
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-05
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -72,6 +72,10 @@ A thin base sits above `Layers::BaseLayer`:
 `UserStories::Graph::Base < Layers::BaseLayer` (adds `include ActiveModel::Validations`).
 Engines define their own base, e.g. `<Engine>::BaseUserStory < Layers::BaseLayer`.
 
+Scaffold the object + spec pair with
+`bin/rails generate layers:user_story <domain>/<action>` — never hand-create files a
+generator scaffolds; fill the generated TODOs.
+
 
 ## Anatomy
 
@@ -81,7 +85,8 @@ Engines define their own base, e.g. `<Engine>::BaseUserStory < Layers::BaseLayer
    - find the record(s); `return failure(errors: ['... not found']) unless record`
    - authorize; `return failure(errors: ['Not authorized ...']) unless authorized?(record)`
    - perform the work (often by delegating to a use case or query object)
-   - `success(result: record)` / `failure(errors: record.errors)`
+   - `success(article: article)` / `failure(errors: article.errors)` — the success payload
+     key **names the object it carries**; there is no such thing as a "result"
 
 ```ruby
 module UserStories
@@ -98,7 +103,7 @@ module UserStories
           return failure(errors: ['Not authorized to update this article']) unless authorized?(article)
 
           if article.update(update_attributes)
-            success(result: article)
+            success(article: article)
           else
             failure(errors: article.errors)
           end
@@ -146,3 +151,5 @@ end
 - duplicating transactional write logic that belongs in a use case — delegate to it.
 - inline complex queries — use a query object ([[authoring-query-objects]]).
 - returning values instead of sending `success`/`failure`.
+- a generic `result` payload key — payloads carry **named objects or errors**. Result-speak
+  seeds Result-object patterns, which metastasize through a codebase.

@@ -4,7 +4,7 @@ title: Authoring Use Cases
 description: How to write a use-case object - a Layers::BaseLayer subclass that performs one transactional unit of work and reports via success/failure. Use when adding or changing classes under app/lib/use_cases.
 category: architecture
 status: active
-version: 1.4
+version: 1.5
 applies_to:
   - Ruby
   - Rails
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-05
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -60,6 +60,9 @@ app/lib/use_cases/<domain>/<action>.rb   →  module UseCases::<Domain>; class <
 A thin base, `ApplicationUseCase < Layers::BaseLayer`, sits at
 `app/lib/use_cases/application_use_case.rb`. In engines/APIs, use the engine-local base
 (e.g. `<Engine>::BaseUseCase < Layers::BaseLayer`).
+
+Scaffold the object + spec pair with `bin/rails generate layers:use_case <domain>/<action>`
+— never hand-create files a generator scaffolds; fill the generated TODOs.
 
 
 ## Anatomy

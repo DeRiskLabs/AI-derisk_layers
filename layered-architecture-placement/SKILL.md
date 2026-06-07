@@ -4,7 +4,7 @@ title: Layered Architecture and Placement
 description: The mental model for the layer abstractions (user stories, use cases, query objects, form objects), what each is responsible for, how they collaborate, and where each file lives. Load when deciding which abstraction to write or where to put it.
 category: architecture
 status: active
-version: 1.4
+version: 1.5
 applies_to:
   - Ruby
   - Rails
@@ -19,7 +19,7 @@ triggers:
 anti_triggers:
   - pure framework config
 user_invocable: true
-last_reviewed_at: 2026-06-04
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -121,3 +121,19 @@ apis/graph/app/lib/user_stories/graph/<domain>/<action>.rb  UserStories::Graph::
 Engines and API engines carry their own `app/lib/...` and base classes. A user story lives
 in the boundary that owns it: graph-facing user stories are boundaries of the graph API, so
 they live in the graph engine's `app/lib/user_stories/` — not in the main app.
+
+
+## Scaffolding
+
+The layers gem generates every layer object in its ruled home, with TODO placeholders for
+the semantics. Never hand-create files a generator scaffolds:
+
+```text
+bin/rails generate layers:use_case <domain>/<action>
+bin/rails generate layers:user_story <domain>/<action>
+bin/rails generate layers:form <domain>/<action>
+bin/rails generate layers:query_object <name>
+bin/rails generate layers:graphql_mutation <domain>/<action>   # --engine <name>
+bin/rails generate layers:graphql_query <domain>               # --single for one record
+bin/rails generate layers:component <name>
+```

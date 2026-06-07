@@ -22,8 +22,8 @@ module Graph
         user_story 'user_stories/graph/articles/fetch_all'
         user_story_arg :current_identity
 
-        def on_success(result: nil)
-          result
+        def on_success(articles: nil)
+          articles
         end
 
         def on_failure(errors: nil)

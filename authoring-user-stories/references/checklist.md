@@ -11,7 +11,8 @@
 - [ ] Reads as a sequence of guard clauses + one happy path.
 - [ ] Find step looks up by public uuid and guards missing records with `failure(errors: [...])`.
 - [ ] Authorization step guards unauthorized actors with `failure(errors: [...])`.
-- [ ] Reports via `success(result:)` / `failure(errors:)` — never returns a value.
+- [ ] Reports via `success(<named_object>:)` / `failure(errors:)` — never returns a value,
+      never a generic `result` key.
 - [ ] Transactional writes delegated to a use case; complex reads to a query object.
 
 ## Boundaries

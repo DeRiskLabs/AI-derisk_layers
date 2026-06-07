@@ -23,9 +23,9 @@ module Graph
         user_story 'user_stories/graph/articles/fetch_all'
         user_story_arg :current_identity
 
-        # Queries return the result DIRECTLY — no payload hash.
-        def on_success(result: nil)
-          result
+        # Queries return the named object DIRECTLY — no payload hash, never a 'result' key.
+        def on_success(articles: nil)
+          articles
         end
 
         # Failures surface as GraphQL execution errors.
@@ -61,8 +61,8 @@ module Graph
         user_story 'user_stories/graph/articles/fetch'
         user_story_arg :current_identity
 
-        def on_success(result: nil)
-          result
+        def on_success(article: nil)
+          article
         end
 
         def on_failure(errors: nil)
@@ -94,7 +94,7 @@ module UserStories
         def call
           articles = Article.where(author: current_identity)
 
-          success(result: articles)
+          success(articles: articles)
         end
       end
     end
@@ -116,7 +116,7 @@ module UserStories
           article = Article.where(author: current_identity).find_by(uuid: id)
 
           if article
-            success(result: article)
+            success(article: article)
           else
             failure(errors: [StandardError.new('Article not found')])
           end

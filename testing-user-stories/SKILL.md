@@ -4,7 +4,7 @@ title: Testing User Stories
 description: Spec pattern for Layers user stories (UserStories::*) - orchestration objects that compose forms, use cases, and queries and report via listener callbacks. Use when writing or modifying specs under spec/user_stories.
 category: testing
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - model spec
   - request spec
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-07
 ---
 
 
@@ -97,7 +97,7 @@ what is specific to user stories.
      end
 
      it 'notifies the listener of success' do
-       expect(listener).to have_received(on_success_callback).with(result: article)
+       expect(listener).to have_received(on_success_callback).with(article: article)
      end
    end
    ```
@@ -150,7 +150,7 @@ RSpec.describe UserStories::Graph::Articles::Update do
 
     context 'when successful' do
       it 'notifies the listener of success' do
-        expect(listener).to have_received(on_success_callback).with(result: article)
+        expect(listener).to have_received(on_success_callback).with(article: article)
       end
     end
 

@@ -91,7 +91,7 @@ RSpec.describe Layers::BaseLayer do
           observer -> { recorder << :success }, of_event: :success
 
           def call
-            success(result: true)
+            success(processed: true)
           end
         end
       end
@@ -105,7 +105,7 @@ RSpec.describe Layers::BaseLayer do
       end
 
       it 'calls the success callback on the listener' do
-        expect(listener).to have_received(:on_success).with(result: true)
+        expect(listener).to have_received(:on_success).with(processed: true)
       end
     end
   end

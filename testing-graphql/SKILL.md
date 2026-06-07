@@ -4,7 +4,7 @@ title: Testing GraphQL Acceptance Specs
 description: Spec pattern for GraphQL acceptance specs that post a query or mutation to /graphql and assert on the parsed JSON data and errors. The ONLY spec layer for GraphQL - mutations, resolvers, and types get no unit specs. Use when writing or modifying specs under spec/acceptance/graph.
 category: testing
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -23,7 +23,7 @@ anti_triggers:
   - use case spec
   - model spec
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-07
 ---
 
 

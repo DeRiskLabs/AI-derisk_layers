@@ -33,7 +33,7 @@ presented. The controller only translated and rendered.
 2. **`BaseEndpoint#resolve`** runs the user story with `listener: self`, merging GraphQL
    arguments with the context-derived identity.
 3. **User story** finds the profile, authorizes the identity, updates (often by delegating to
-   the same `UseCases::Profiles::Update`), and reports `success(result:)` /
+   the same `UseCases::Profiles::Update`), and reports `success(profile:)` /
    `failure(errors:)`.
 4. **User story calls back** the mutation's `on_success` / `on_failure`, which return the
    `{ profile, errors }` payload.
