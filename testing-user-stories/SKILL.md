@@ -159,7 +159,7 @@ RSpec.describe UserStories::Articles::Update do
   let(:id)      { article.uuid }
   let(:title)   { 'Updated Title' }
   let(:valid_use_case_args) do
-    { current_identity: author, id: id, title: title }
+    { current_authorization: author, id: id, title: title }
   end
   let(:valid_params) { valid_listener_args.merge(valid_use_case_args) }
   let(:params) { valid_params }

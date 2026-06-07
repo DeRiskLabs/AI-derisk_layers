@@ -13,7 +13,7 @@ module UserStories
     module Articles
       class Update < UserStories::Graph::Base   # Base < Layers::BaseLayer + ActiveModel::Validations
         # Declare exactly the inputs the action needs. Lookups arrive as public uuids.
-        required :current_identity
+        required :current_authorization
         required :id
         optional :title
 
@@ -51,7 +51,7 @@ module UserStories
         # Memoized scoped lookup. The registry returns the container's query object
         # class; the engine never names it.
         def article
-          @article ||= articles_query.new(identity: current_identity).find_by(uuid: id)
+          @article ||= articles_query.new(authorization: current_authorization).find_by(uuid: id)
         end
 
         def articles_query

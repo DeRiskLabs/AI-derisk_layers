@@ -19,7 +19,7 @@ module UserStories
   module Graph
     module Articles
       class Update < UserStories::Graph::Base
-        required :current_identity
+        required :current_authorization
         required :id
         optional :title
 
@@ -49,7 +49,7 @@ module UserStories
         private
 
         def article
-          @article ||= articles_query.new(identity: current_identity).find_by(uuid: id)
+          @article ||= articles_query.new(authorization: current_authorization).find_by(uuid: id)
         end
 
         def articles_query
@@ -87,7 +87,7 @@ RSpec.describe UserStories::Graph::Articles::Update do
   # Registry fakes: the engine's registries are swapped wholesale — anything
   # answering [] serves. The query object and use case are verifying doubles of
   # the contracts the container will bind.
-  let(:identity)       { instance_double('Identity') }
+  let(:authorization)  { instance_double('Authorization') }
   let(:id)             { SecureRandom.uuid }
   let(:title)          { 'Updated Title' }
   let(:article)        { instance_double('Article', errors: article_errors) }
@@ -98,7 +98,7 @@ RSpec.describe UserStories::Graph::Articles::Update do
   let(:query_instance)  { instance_double('Queries::ArticlesQuery', find_by: article) }
 
   let(:valid_use_case_args) do
-    { current_identity: identity, id: id, title: title }
+    { current_authorization: authorization, id: id, title: title }
   end
   let(:valid_params) { valid_listener_args.merge(valid_use_case_args) }
   let(:params) { valid_params }
@@ -116,8 +116,8 @@ RSpec.describe UserStories::Graph::Articles::Update do
 
     context 'when the article is in reach' do
       # The story's work is two outgoing messages: scope the lookup, send the command.
-      it 'scopes the lookup to the current identity' do
-        expect(articles_query).to have_received(:new).with(identity: identity)
+      it 'scopes the lookup to the current authorization' do
+        expect(articles_query).to have_received(:new).with(authorization: authorization)
       end
 
       it 'sends the update command with itself as listener' do

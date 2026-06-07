@@ -26,14 +26,15 @@ module Graph
           description: 'Errors encountered during article creation'
 
         user_story 'user_stories/graph/articles/create'
-        user_story_arg :current_identity
+        user_story_arg :current_authorization
 
         def on_success(article: nil)
           { article: article, errors: [] }
         end
 
-        def on_failure(errors: nil)
-          { article: nil, errors: execution_errors_for(errors) }
+        def on_failure(article: nil, errors: nil)
+          errors_list = Array(article ? article.errors : errors)
+          { article: article, errors: execution_errors_for(errors_list) }
         end
       end
     end

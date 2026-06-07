@@ -23,8 +23,8 @@ module Graph
       private
 
       # Trusted values for user_story_arg — always from context, never client input.
-      def current_identity
-        context[:current_identity]
+      def current_authorization
+        context[:current_authorization]
       end
 
       def current_user_account
@@ -83,8 +83,8 @@ module Graph
         context[:current_user_account]
       end
 
-      def current_identity
-        context[:current_identity]
+      def current_authorization
+        context[:current_authorization]
       end
     end
   end
@@ -98,7 +98,7 @@ From the layers gem (`Layers::Graphql::BaseEndpoint`):
 
 - `user_story 'user_stories/graph/articles/create'` — declares the story (camelized and
   constantized at resolve time).
-- `user_story_arg :current_identity` — merges the named private method's value into the
+- `user_story_arg :current_authorization` — merges the named private method's value into the
   story's inputs; raises `InvalidUserStoryArgumentMethod` if the method is missing.
 - `#resolve(**args)` — captures client args, runs the story with
   `listener: self, on_success: :success, on_failure: :failure`, and MASKS any raised

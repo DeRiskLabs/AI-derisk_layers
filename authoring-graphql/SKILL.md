@@ -97,8 +97,8 @@ module Graph
 
       private
 
-      def current_identity
-        context[:current_identity]
+      def current_authorization
+        context[:current_authorization]
       end
 
       def current_user_account

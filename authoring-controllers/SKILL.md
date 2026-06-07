@@ -161,7 +161,7 @@ end
 - Records are looked up by `uuid` (the public identifier), scoped to the current identity.
 - Errors are handled by a shared concern via `rescue_from` + an error serializer, not ad-hoc
   rescues scattered in actions.
-- Authentication/authorization live in a concern (`before_action`); expose `current_identity`
+- Authentication/authorization live in a concern (`before_action`); expose `current_authorization`
   / `current_user_account` there.
 - JSON:API responses go through serializers and a single `render_json_api` helper.
 

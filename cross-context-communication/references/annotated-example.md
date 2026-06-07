@@ -129,7 +129,7 @@ end
 - Reading data is the simpler contract — no listener:
 
 ```ruby
-Accounts.profiles_for(identity_uuid: current_identity.uuid).map { |p| present(p) }
+Accounts.profiles_for(identity_uuid: current_authorization.uuid).map { |p| present(p) }
 ```
 
 

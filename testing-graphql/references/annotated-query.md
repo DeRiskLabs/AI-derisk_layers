@@ -20,14 +20,15 @@ module Graph
         type [Types::Articles::Type], null: false
 
         user_story 'user_stories/graph/articles/fetch_all'
-        user_story_arg :current_identity
+        user_story_arg :current_authorization
 
         def on_success(articles: nil)
           articles
         end
 
-        def on_failure(errors: nil)
-          errors&.map do |error|
+        def on_failure(articles: nil, errors: nil)
+          errors_list = Array(articles ? articles.errors : errors)
+          errors_list.map do |error|
             GraphQL::ExecutionError.new(error.message)
           end
         end

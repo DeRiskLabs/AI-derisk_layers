@@ -4,7 +4,7 @@ title: Authoring GraphQL Mutations
 description: How to write a declarative GraphQL mutation - an ApplicationMutation subclass that declares arguments, a payload, and the user story to run via the layers gem's user_story DSL. Use when adding or changing files under apis/graph/app/graphql/graph/mutations.
 category: architecture
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -63,7 +63,7 @@ TODOs.
 3. `argument`s with project scalar types and descriptions — only client-supplied values.
 4. Payload: `field :<resource>, ...` + `field :errors, [Types::Base::ErrorType]`.
 5. `user_story 'user_stories/graph/<domain>/<action>'` — the behaviour, by name.
-6. `user_story_arg :current_identity` — trusted inputs drawn from `context`.
+6. `user_story_arg :current_authorization` — trusted inputs drawn from `context`.
 7. `on_success` / `on_failure` — return the payload hash, nothing more.
 8. Register in `MutationType`: `field :create_article, mutation: Graph::Mutations::Articles::CreateArticle`.
 
@@ -85,7 +85,7 @@ module Graph
           description: 'Errors encountered during article creation'
 
         user_story 'user_stories/graph/articles/create'
-        user_story_arg :current_identity
+        user_story_arg :current_authorization
 
         def on_success(article: nil)
           {
@@ -94,10 +94,11 @@ module Graph
           }
         end
 
-        def on_failure(errors: nil)
+        def on_failure(article: nil, errors: nil)
+          errors_list = Array(article ? article.errors : errors)
           {
-            article: nil,
-            errors: execution_errors_for(errors)
+            article: article,
+            errors: execution_errors_for(errors_list),
           }
         end
       end

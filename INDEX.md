@@ -21,7 +21,8 @@ Using the layers gem in a Rails app. Assumes: derisk_common, derisk_ruby, derisk
 - [[authoring-graphql-mutations]] — declarative mutations via `user_story` / `user_story_arg`.
 - [[authoring-graphql-queries]] — declarative query resolvers; scoping in the user story.
 - [[authoring-layers-jobs]] — the layers overlay on jobs: Layers::BaseJob, JobFailed retry mapping, fire_and_forget.
-- [[api-authentication-authorization]] — authentication at the engine edge; authorization as identity scoping in user stories.
+- [[authoring-layers-forms]] — the layers overlay on forms: ApplicationForm over Layers::BaseForm; each form writes only accessors, validations, builders, whitelist.
+- [[api-authentication-authorization]] — authentication at the engine edge producing the security credential (current_authorization); authorization as credential scoping in user stories.
 
 ## Testing
 

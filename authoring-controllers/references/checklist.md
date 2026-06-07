@@ -29,7 +29,7 @@
 
 ## Cross-cutting
 
-- [ ] Authentication/authorization in a concern; `current_identity`/`current_user_account`
+- [ ] Authentication/authorization in a concern; `current_authorization`/`current_user_account`
       from it.
 - [ ] Look-ups by `uuid`, scoped to the current identity — never unscoped or by numeric id.
 - [ ] Errors via shared `rescue_from` + error serializer, not ad-hoc rescues.

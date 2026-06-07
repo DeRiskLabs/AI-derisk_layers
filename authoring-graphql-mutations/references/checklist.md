@@ -7,7 +7,9 @@
 - [ ] `user_story 'user_stories/graph/<domain>/<action>'` declared; story exists at that path.
 - [ ] `user_story_arg`s map to private readers on the base (context-derived), not client args.
 - [ ] `on_success(<resource>:)` returns `{ <resource>:, errors: [] }`.
-- [ ] `on_failure(errors:)` returns `{ <resource>: nil, errors: execution_errors_for(errors) }`.
+- [ ] `on_failure(<resource>: nil, errors: nil)` accepts the named object or an errors
+      collection (the failure contract), and returns
+      `{ <resource>:, errors: execution_errors_for(errors_list) }`.
 - [ ] Registered in `MutationType` (`field :<action>_<resource>, mutation: ...`).
 - [ ] No business logic anywhere in the mutation.
 - [ ] Acceptance spec written per [[testing-graphql]]; NO unit spec for the mutation.

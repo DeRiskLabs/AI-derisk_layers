@@ -29,9 +29,9 @@ presented. The controller only translated and rendered.
 
 1. **Schema → `Graph::Mutations::UpdateProfile`** (a `Layers::Graphql::BaseEndpoint`).
    It declares `user_story 'user_stories/graph/profiles/update'` and
-   `user_story_arg :current_identity` (from `context`).
+   `user_story_arg :current_authorization` (from `context`).
 2. **`BaseEndpoint#resolve`** runs the user story with `listener: self`, merging GraphQL
-   arguments with the context-derived identity.
+   arguments with the context-derived credential.
 3. **User story** finds the profile, authorizes the identity, updates (often by delegating to
    the same `UseCases::Profiles::Update`), and reports `success(profile:)` /
    `failure(errors:)`.
@@ -44,5 +44,5 @@ caller was REST or GraphQL — that is the point of the listener boundary.
 ## Reads
 
 A read skips the use case: the controller (or a user story / resolver) builds a query object
-(`Queries::IdentityScoped::ProfilesQuery.new(current_identity)`), applies
+(`Queries::IdentityScoped::ProfilesQuery.new(current_authorization)`), applies
 `order`/`page`/`per`, and renders the relation through a serializer.

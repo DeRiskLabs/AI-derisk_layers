@@ -32,7 +32,7 @@ module Graph
 
         # Trusted input from context (via the base's private reader) — the client
         # cannot supply or override it.
-        user_story_arg :current_identity
+        user_story_arg :current_authorization
 
         # The story calls back exactly one of these. Return value = GraphQL payload.
         def on_success(article: nil)
@@ -42,10 +42,13 @@ module Graph
           }
         end
 
-        def on_failure(errors: nil)
+        # Accepts the failure contract either way: the named object (read its
+        # .errors) or an errors collection itself.
+        def on_failure(article: nil, errors: nil)
+          errors_list = Array(article ? article.errors : errors)
           {
-            article: nil,
-            errors: execution_errors_for(errors)   # uniform { message, path } mapping
+            article: article,
+            errors: execution_errors_for(errors_list),   # uniform { message, path } mapping
           }
         end
       end
@@ -66,11 +69,11 @@ module UserStories
   module Graph
     module Articles
       class Create < UserStories::Graph::Base
-        required :current_identity
+        required :current_authorization
         required :title
 
         def call
-          article = Article.new(title: title, author: current_identity)
+          article = Article.new(title: title, author: current_authorization)
 
           if article.save
             success(article: article)
@@ -108,7 +111,7 @@ end
 - **`user_story` + `user_story_arg`.** `BaseEndpoint#resolve` merges client arguments with
   context-derived values and runs the named story with `listener: self`. The mutation is a
   declaration, not an implementation.
-- **`current_identity` from context.** Trust is never delegated to client input.
+- **`current_authorization` from context.** Trust is never delegated to client input.
 - **Resource-named payload.** Every mutation returns `{ <resource>, errors }`; errors carry
   `message` + `path` via `execution_errors_for`, so clients handle failures uniformly.
 - **No unit spec.** The declaration is exercised end-to-end by its acceptance spec; the

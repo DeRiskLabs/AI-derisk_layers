@@ -21,16 +21,18 @@ module Graph
 
         # The behaviour, by name; identity from context — never a client argument.
         user_story 'user_stories/graph/articles/fetch_all'
-        user_story_arg :current_identity
+        user_story_arg :current_authorization
 
         # Queries return the named object DIRECTLY — no payload hash, never a 'result' key.
         def on_success(articles: nil)
           articles
         end
 
-        # Failures surface as GraphQL execution errors.
-        def on_failure(errors: nil)
-          errors&.map do |error|
+        # Failures surface as GraphQL execution errors. Accepts the failure
+        # contract either way: the named object (read its .errors) or errors.
+        def on_failure(articles: nil, errors: nil)
+          errors_list = Array(articles ? articles.errors : errors)
+          errors_list.map do |error|
             GraphQL::ExecutionError.new(error.message)
           end
         end
@@ -59,14 +61,15 @@ module Graph
         type Types::Articles::Type, null: true
 
         user_story 'user_stories/graph/articles/fetch'
-        user_story_arg :current_identity
+        user_story_arg :current_authorization
 
         def on_success(article: nil)
           article
         end
 
-        def on_failure(errors: nil)
-          errors&.map do |error|
+        def on_failure(article: nil, errors: nil)
+          errors_list = Array(article ? article.errors : errors)
+          errors_list.map do |error|
             GraphQL::ExecutionError.new(error.message)
           end
         end
@@ -80,7 +83,7 @@ end
 ## The User Stories They Run
 
 Compact — authored per [[authoring-user-stories]]. **Scoping lives here**, driven by
-`current_identity`, and the lookup goes through the engine's injected query-object
+`current_authorization`, and the lookup goes through the engine's injected query-object
 registry — engine code never names container constants (doctrine ruling 15):
 
 ```ruby
@@ -90,7 +93,7 @@ module UserStories
   module Graph
     module Articles
       class FetchAll < UserStories::Graph::Base
-        required :current_identity
+        required :current_authorization
 
         emits success: [:articles], failure: [:errors]
 
@@ -102,7 +105,7 @@ module UserStories
         private
 
         def articles
-          articles_query.new(identity: current_identity).all
+          articles_query.new(authorization: current_authorization).all
         end
 
         def articles_query
@@ -121,7 +124,7 @@ module UserStories
   module Graph
     module Articles
       class Fetch < UserStories::Graph::Base
-        required :current_identity
+        required :current_authorization
         required :id
 
         emits success: [:article], failure: [:errors]
@@ -134,7 +137,7 @@ module UserStories
         private
 
         def article
-          articles_query.new(identity: current_identity).find_by(uuid: id)
+          articles_query.new(authorization: current_authorization).find_by(uuid: id)
         end
 
         def articles_query
@@ -178,7 +181,7 @@ end
 
 - **Result returned directly.** Unlike mutations, the resolver's return value IS the field
   value; GraphQL nulls/errors handle the failure channel via `GraphQL::ExecutionError`.
-- **Scoping in the story, not the resolver.** `Article.where(author: current_identity)` is
+- **Scoping in the story, not the resolver.** `Article.where(author: current_authorization)` is
   behaviour — it belongs with the user story, where it is unit-tested
   ([[testing-user-stories]]) and exercised by the acceptance spec's scoping case.
 - **Plural/singular resolver pairs.** `Articles::Articles` and `Articles::Article` mirror

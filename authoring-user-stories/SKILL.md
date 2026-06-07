@@ -80,7 +80,7 @@ generator scaffolds; fill the generated TODOs.
 ## Anatomy
 
 1. Inherit from the relevant base (`UserStories::Graph::Base` / `<Engine>::BaseUserStory`).
-2. Declare inputs with `required` / `optional` (e.g. `required :current_identity, :id`).
+2. Declare inputs with `required` / `optional` (e.g. `required :current_authorization, :id`).
 3. Implement `#call` as an orchestration with explicit guard clauses:
    - find the record(s) through an **identity-scoped lookup** — authorization is reach,
      not flags: records outside the identity's scope are simply not found
@@ -98,7 +98,7 @@ module UserStories
   module Graph
     module Articles
       class Update < UserStories::Graph::Base
-        required :current_identity
+        required :current_authorization
         required :id
         optional :title
 
@@ -126,7 +126,7 @@ module UserStories
         private
 
         def article
-          @article ||= articles_query.new(identity: current_identity).find_by(uuid: id)
+          @article ||= articles_query.new(authorization: current_authorization).find_by(uuid: id)
         end
 
         def articles_query

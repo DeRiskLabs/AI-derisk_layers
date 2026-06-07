@@ -4,7 +4,7 @@ title: Authoring GraphQL Queries
 description: How to write a declarative GraphQL query resolver - an ApplicationResolver subclass that declares arguments, a return type, and the user story to run via the layers gem's user_story DSL. Use when adding or changing files under apis/graph/app/graphql/graph/resolvers.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -60,7 +60,7 @@ resolver) — never hand-create files a generator scaffolds; fill the generated 
 2. `description` — every resolver has one.
 3. `argument`s for client-supplied lookups (e.g. `:id, Types::Base::UuidType`).
 4. `type ..., null:` — the return type (array for lists).
-5. `user_story 'user_stories/graph/<domain>/<fetch>'` + `user_story_arg :current_identity`.
+5. `user_story 'user_stories/graph/<domain>/<fetch>'` + `user_story_arg :current_authorization`.
 6. `on_success` receives the **named object** the story emits (`articles:` for a list,
    `article:` for one record) and returns it **directly** (not a payload hash). Payload
    keys always name what they carry — never a generic `result` key, which seeds
@@ -80,14 +80,15 @@ module Graph
         type [Types::Articles::Type], null: false
 
         user_story 'user_stories/graph/articles/fetch_all'
-        user_story_arg :current_identity
+        user_story_arg :current_authorization
 
         def on_success(articles: nil)
           articles
         end
 
-        def on_failure(errors: nil)
-          errors&.map do |error|
+        def on_failure(articles: nil, errors: nil)
+          errors_list = Array(articles ? articles.errors : errors)
+          errors_list.map do |error|
             GraphQL::ExecutionError.new(error.message)
           end
         end
@@ -121,7 +122,7 @@ user_story 'user_stories/graph/articles/fetch'
 
 ## Rules
 
-- **Scoping lives in the user story**, driven by `current_identity` — the resolver never
+- **Scoping lives in the user story**, driven by `current_authorization` — the resolver never
   filters. A list story returns only records the identity may see; a fetch story returns
   `nil`/failure for records outside that scope.
 - The resolver contains no business logic — it declares and delegates.
