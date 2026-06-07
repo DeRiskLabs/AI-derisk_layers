@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 2.0
+version: 2.1
 applies_to:
   - Ruby
   - Rails
@@ -97,28 +97,58 @@ The full skill inventory lives in each collection's `INDEX.md`
 `references/request-flow.md`.
 
 
-## Where to start, by task
+## Decision tree: what to generate
 
-| Building… | Skill |
-| --- | --- |
-| Deciding where a boundary goes / splitting a context | [[boundaries-and-context-mapping]] |
-| Deciding which object / where it goes | [[layered-architecture-placement]] |
-| A pure-domain bounded context (`components/*`) | [[authoring-components]] |
-| An engine — feature slice or API home (`engines/*`, `apis/*`) | [[authoring-engines]] |
-| A REST endpoint | [[authoring-controllers]] |
-| The GraphQL layer (engine, base classes, types) | [[authoring-graphql]] |
-| A GraphQL mutation | [[authoring-graphql-mutations]] |
-| A GraphQL query/resolver | [[authoring-graphql-queries]] |
-| A user-facing action's orchestration | [[authoring-user-stories]] |
-| A single transactional write | [[authoring-use-cases]] |
-| Param validation + object building | [[authoring-form-objects]] |
-| A scoped read | [[authoring-query-objects]] |
-| A model | [[authoring-models]] |
-| A JSON:API response | [[authoring-serializers]] |
-| A background job | [[authoring-layers-jobs]] (over [[authoring-jobs]]) |
-| A mailer | [[authoring-mailers]] |
-| A rake task | [[authoring-rake-tasks]] |
-| Endpoint auth / a permission check | [[api-authentication-authorization]] |
+Generators own structure; you fill in semantics. **Never hand-create a file a generator
+scaffolds.** Walk the tree to the generator command, then read the paired skill to fill
+the TODOs.
+
+```text
+What are you building?
+│
+├─ A whole bounded context with no Rails abstractions (pure domain)?
+│     → bin/rails generate layers:component <name>
+│       then [[authoring-components]] — root-constant interface, repository registry
+│
+├─ A bounded slice that needs Rails abstractions (controllers, views, jobs, mailers,
+│  GraphQL, serializers)?
+│     ├─ a collection of API endpoints?   → layers:engine <name> --family api   (apis/)
+│     └─ a feature slice?                 → layers:engine <name>                (engines/)
+│       then [[authoring-engines]] — registries injected by the container
+│
+├─ A delivery endpoint inside an existing engine?
+│     ├─ GraphQL mutation (a write)?      → layers:graphql_mutation <domain>/<action>
+│     │                                     then [[authoring-graphql-mutations]]
+│     ├─ GraphQL query (a read)?          → layers:graphql_query <domain> [--single]
+│     │                                     then [[authoring-graphql-queries]]
+│     └─ REST/JSON:API endpoint?          → [[authoring-controllers]]
+│
+├─ A piece of business logic?
+│     ├─ orchestrates a whole user action (find → act → respond)?
+│     │     → bin/rails generate layers:user_story <domain>/<action>
+│     │       then [[authoring-user-stories]]
+│     ├─ one transactional write?
+│     │     → bin/rails generate layers:use_case <domain>/<action>
+│     │       then [[authoring-use-cases]]
+│     ├─ validates params and builds domain objects?
+│     │     → bin/rails generate layers:form <domain>/<action>
+│     │       then [[authoring-layers-forms]] / [[authoring-form-objects]]
+│     └─ a scoped, composable read?
+│           → bin/rails generate layers:query_object <name>
+│             then [[authoring-query-objects]]
+│
+└─ Rails-specific, no generator yet — read the skill and place by hand:
+      model            → [[authoring-models]]
+      serializer       → [[authoring-serializers]]
+      job              → [[authoring-layers-jobs]] (over [[authoring-jobs]])
+      mailer           → [[authoring-mailers]]
+      rake task        → [[authoring-rake-tasks]]
+      endpoint auth    → [[api-authentication-authorization]]
+```
+
+Earlier, design-level questions — **where** a boundary goes or how to split a context —
+are [[boundaries-and-context-mapping]]; **which** object a responsibility becomes is
+[[layered-architecture-placement]].
 
 
 ## The Pairing Rule
