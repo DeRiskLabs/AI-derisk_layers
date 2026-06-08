@@ -3,8 +3,9 @@
 ## Placement & shape
 - [ ] File at `app/lib/use_cases/<domain>/<action>.rb`; class `UseCases::<Domain>::<Action>`.
 - [ ] Inherits from `ApplicationUseCase` (or the engine-local base) which inherits `Layers::BaseLayer`.
-- [ ] Inputs declared with `required` / `optional`; prefers `required :form`.
-- [ ] Needed form methods exposed via `delegate`.
+- [ ] Raw inputs declared with `required` / `optional` (not a pre-built `form:`).
+- [ ] When validation/construction is needed, a `Forms::` peer is built internally and
+      `valid?` delegated to it; a use case with no such need skips the form.
 
 ## #call
 - [ ] Represents exactly one action (no "and").

@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 2.1
+version: 2.2
 applies_to:
   - Ruby
   - Rails
@@ -21,7 +21,7 @@ triggers:
 anti_triggers:
   - non-Ruby work
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: 2026-06-08
 ---
 
 
@@ -121,7 +121,10 @@ What are you building?
 │     │                                     then [[authoring-graphql-mutations]]
 │     ├─ GraphQL query (a read)?          → layers:graphql_query <domain> [--single]
 │     │                                     then [[authoring-graphql-queries]]
-│     └─ REST/JSON:API endpoint?          → [[authoring-controllers]]
+│     └─ REST/JSON:API command (create/update/destroy)?
+│                                          → layers:api_endpoint <resource>/<action>
+│                                            then [[authoring-api-endpoints]]
+│       (a read endpoint: a query object + serializer — [[authoring-controllers]])
 │
 ├─ A piece of business logic?
 │     ├─ orchestrates a whole user action (find → act → respond)?

@@ -4,7 +4,7 @@ title: Testing Use Cases
 description: Spec pattern for testing Layers::BaseLayer use cases (UseCases::*) that communicate by message passing to a listener. User stories share these mechanics - see testing-user-stories. Use when writing or modifying specs for classes under app/lib/use_cases.
 category: testing
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - request spec
   - graphql acceptance spec
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-08
 ---
 
 
@@ -78,9 +78,19 @@ let(:valid_listener_args) do
   }
 end
 
-let(:valid_use_case_args) { { form: form } }            # inputs the object declares
+let(:valid_use_case_args) { { profile_id: 1, first_name: 'Ada' } }  # the RAW inputs declared
 let(:valid_params) { valid_listener_args.merge(valid_use_case_args) }
 let(:params) { valid_params }                           # contexts re-point :params or a leaf let
+```
+
+A use case takes **raw inputs** and builds its form peer internally (ruling 16), so the
+args are the raw inputs — not a `form:`. Double the form interface and stub the
+construction the use case performs:
+
+```ruby
+let(:form) { instance_double('Forms::Profiles::UpdateForm', valid?: true, profile: profile) }
+
+before { allow(Forms::Profiles::UpdateForm).to receive(:new).and_return(form) }
 ```
 
 
@@ -213,9 +223,11 @@ RSpec.describe UseCases::Profiles::Update do
 
   let(:form) { instance_double('Forms::Profiles::UpdateForm', valid?: true, profile: profile) }
   let(:profile) { instance_spy('Profile') }
-  let(:valid_use_case_args) { { form: form } }
+  let(:valid_use_case_args) { { profile_id: 1, first_name: 'Ada' } }
   let(:valid_params) { valid_listener_args.merge(valid_use_case_args) }
   let(:params) { valid_params }
+
+  before { allow(Forms::Profiles::UpdateForm).to receive(:new).and_return(form) }
 
 
   describe '.call' do

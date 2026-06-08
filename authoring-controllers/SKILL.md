@@ -4,7 +4,7 @@ title: Authoring Controllers
 description: How to write thin controllers that delegate work to use cases or user stories as listener and render the outcome - JSON:API controllers via serializers, HTML controllers via flash/redirect. Use when adding or changing controllers in the app or an engine.
 category: architecture
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - use case internals
   - model logic
 user_invocable: true
-last_reviewed_at: 2026-06-03
+last_reviewed_at: 2026-06-08
 ---
 
 
@@ -63,29 +63,36 @@ engine (`engines/<engine>/app/controllers/...`) under that engine's base control
 
 ## Anatomy of a mutating action (JSON:API)
 
+A REST controller lives in an api engine, so it obeys ruling 15/16: it never names a
+container use case or builds a container form. It delegates to its **engine sibling
+user story** (engine-owned — naming it is fine), which is the fast exit to the
+container use case via the registry; the use case builds its own form peer. Generate
+the whole slice with `bin/rails generate layers:api_endpoint <resource>/<action>`.
+
 1. `before_action` guards validate request shape / existence (return rendered errors).
-2. Build a form object from permitted params (`parsed_params` merges the raw JSON body
-   into `params`; define it privately).
-3. Call the use case as a class method, passing the controller as listener:
+2. Call the engine's user story as a class method, controller as listener, forwarding
+   the credential and the permitted raw params:
    ```ruby
-   UseCases::Profiles::Update.call(
-     form: form,
+   UserStories::V1::Profiles::Update.call(
+     current_authorization: current_authorization,
+     profile_id: params[:uuid],
+     **permitted_params,
      listener: self,
      on_success: :update_succeeded,
      on_failure: :update_failed,
    )
    ```
-4. Define the callback methods (public) that render the response:
+3. Define the callback methods (public) that render the response:
    ```ruby
    def update_succeeded(profile:)
      render_json_api(profile, serializer: V1::ProfileSerializer)
    end
 
-   def update_failed(form:)
-     render_form_errors(errors: form.errors.map { |e| ... })
+   def update_failed(errors: nil)
+     render_json_api_errors(errors)
    end
    ```
-5. Keep params parsing, look-ups, and validations in private methods.
+4. Keep params parsing and look-ups in private methods.
 
 
 ## Anatomy of an HTML action

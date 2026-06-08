@@ -4,7 +4,7 @@ title: Authoring Use Cases
 description: How to write a use-case object - a Layers::BaseLayer subclass that performs one transactional unit of work and reports via success/failure. Use when adding or changing classes under app/lib/use_cases.
 category: architecture
 status: active
-version: 1.5
+version: 1.6
 applies_to:
   - Ruby
   - Rails
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: 2026-06-08
 ---
 
 
@@ -68,38 +68,53 @@ Scaffold the object + spec pair with `bin/rails generate layers:use_case <domain
 ## Anatomy
 
 1. Inherit from `ApplicationUseCase`.
-2. Declare inputs with `required` / `optional`. Prefer taking a validated **form** object
-   (`required :form`) rather than loose attributes.
-3. `delegate` the bits of the form you need (`delegate :valid?, :record, to: :form`).
+2. Declare the **raw inputs** the operation needs with `required` / `optional` — not a
+   pre-built form. Nothing upstream builds a form for you: a user story (the caller from
+   an engine) passes raw inputs, and engine delivery code cannot name a container form
+   anyway (ruling 16). The use case is the injected business operation; the form is a
+   container **peer** it reaches for.
+3. When the operation validates and constructs persistable objects, build a `Forms::`
+   peer from the inputs and `delegate :valid?, to: :form`. (A use case that needs no
+   validation/construction skips the form entirely — forms are not mandatory.)
 4. Implement `#call`:
    - guard on validity first: `return failure(form: form) unless valid?`
    - wrap writes in `ActiveRecord::Base.transaction`
-   - on success: `success(<record>: record)`
-   - rescue persistence errors → `failure(form: form)`
+   - on success: `success(<named_object>: ...)`
+   - rescue persistence errors → `failure(form: form)` (the form responds to `.errors`)
 
 ```ruby
 module UseCases
   module Profiles
     class Update < ApplicationUseCase
-      required :form
+      required :profile_id
+      optional :first_name, :last_name
 
       delegate :valid?, to: :form
-      delegate :profile, to: :form
 
       def call
         return failure(form: form) unless valid?
 
-        ActiveRecord::Base.transaction do
-          profile.update!(first_name: form.first_name, last_name: form.last_name)
-        end
-        success(profile: profile)
+        ActiveRecord::Base.transaction { form.profile.save! }
+        success(profile: form.profile)
       rescue ActiveRecord::RecordInvalid
         failure(form: form)
+      end
+
+
+      private
+
+      def form
+        @form ||= Forms::Profiles::UpdateForm.new(
+          profile_id: profile_id, first_name: first_name, last_name: last_name,
+        )
       end
     end
   end
 end
 ```
+
+`Forms::Profiles::UpdateForm` is a container peer (`app/lib/forms` and `app/lib/use_cases`
+sit at the same level and collaborate freely) — see [[authoring-layers-forms]].
 
 
 ## Rules
@@ -124,7 +139,8 @@ end
 
 ## Avoid
 
-- accepting loose attributes when a form would validate them — push validation into a form.
+- validating or coercing inline when a form peer should — push validation into a `Forms::`
+  peer the use case builds (do not, however, expect a pre-built form to arrive: ruling 16).
 - doing reads/queries a query object should own (see [[authoring-query-objects]]).
 - multiple responsibilities; orchestration across several use cases belongs in a user story
   ([[authoring-user-stories]]).

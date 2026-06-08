@@ -1,8 +1,11 @@
 # Annotated Examples — Controllers
 
 Two annotated controllers: a JSON:API resource controller (neutral domain:
-`V1::ProfilesController`) and an HTML controller (a sessions login flow). Request specs
-for both flavours: [[testing-rails-requests]].
+`V1::ProfilesController`) and an HTML controller (a sessions login flow). Both live in
+api/feature engines, so they obey ruling 15/16: a controller never names a container
+use case, query, form, or model — it delegates to its **engine sibling user story**
+(writes) or resolves a **query through the engine registry** (reads). Request specs for
+both flavours: [[testing-rails-requests]].
 
 
 ## JSON:API Controller
@@ -12,49 +15,51 @@ for both flavours: [[testing-rails-requests]].
 
 module V1
   class ProfilesController < V1::ApplicationController   # includes ErrorHandling + Authorization
-    before_action :validate_profile_found
     before_action :validate_json_api_payload, only: %i[update]
     before_action :validate_type, only: %i[update]
 
     def show
-      # Reads render directly through a serializer; no layer object for a simple read.
+      # A read: ask the registry-resolved, authorization-scoped query. Out-of-reach
+      # records simply are not found.
+      profile = profiles_query.find_by(uuid: params[:uuid])
+      return render_json_api_error(:not_found, resource_type: 'profile', status: :not_found) unless profile
+
       render_json_api(profile, serializer: V1::ProfileSerializer,
                                includes: V1::ProfileSerializer::STANDARD_INCLUDES)
     end
 
     def update
-      # 1. Build the form from permitted params.
-      form = Forms::V1::ProfileUpdate.new(profile: profile, **profile_params)
-
-      # 2. Hand it to the use case; the controller is the listener.
-      UseCases::Profiles::Update.call(
-        form: form,
+      # A write: delegate to the engine sibling story, forwarding the credential and
+      # the permitted raw params. The story exits to the use case via the registry; the
+      # use case builds its form peer. The controller is the listener.
+      UserStories::V1::Profiles::Update.call(
+        current_authorization: current_authorization,
+        profile_id: params[:uuid],
+        **profile_params,
         listener: self,
         on_success: :update_succeeded,
         on_failure: :update_failed,
       )
     end
 
-    ## Callbacks (public — the use case calls these back)
+    ## Callbacks (public — the story calls these back)
 
     def update_succeeded(profile:)
       render_json_api(profile, serializer: V1::ProfileSerializer,
                                includes: V1::ProfileSerializer::STANDARD_INCLUDES)
     end
 
-    def update_failed(form:)
-      render_form_errors(errors: form.errors.map do |error|
-        V1::ErrorSerializer::Error.new(attribute: error.attribute, message: error.message)
-      end)
+    def update_failed(errors: nil)
+      render_json_api_errors(errors)
     end
 
 
     private
 
-    # Look-ups are identity-scoped and by uuid — the public identifier.
-    def profile
-      @profile ||= Profile.where(identity: current_user_account.identity)
-                          .find_by(uuid: params[:uuid])
+    # The query is resolved through the engine registry and constructed with the
+    # credential — never `Queries::...` named directly (ruling 15).
+    def profiles_query
+      V1.configuration.queries[:profiles].new(authorization: current_authorization)
     end
 
     def profile_params
@@ -64,11 +69,6 @@ module V1
     # JSON:API clients send a raw JSON body; merge it into params once.
     def parsed_params
       @parsed_params ||= params.merge(JSON.parse(request.raw_post))
-    end
-
-    def validate_profile_found
-      return if profile
-      render_json_api_error(:not_found, resource_type: 'profile', status: :not_found)
     end
   end
 end
@@ -87,11 +87,11 @@ module Auth
     def new; end
 
     def create
-      # The work is a user story; the controller is its listener.
+      # The work is a user story; the controller is its listener. The story looks up the
+      # account (via its query registry) and authenticates — the controller names no model.
       UserStories::Auth::AuthenticateUserAccount.call(
+        email: params[:email],
         password: params[:password],
-        user_account: user_account,
-
         listener: self,
         on_failure: :login_failure,
         on_success: :login_successful,
@@ -118,14 +118,6 @@ module Auth
       flash[:notice] = I18n.t('auth.logout.success')
       redirect_to auth.root_path
     end
-
-
-    private
-
-    def user_account
-      @user_account ||= UserAccount.joins(identity: :email_addresses)
-                                   .find_by(email_addresses: { email: params[:email] })
-    end
   end
 end
 ```
@@ -133,18 +125,21 @@ end
 
 ## Why these choices
 
-- **Thin actions.** `update`/`create` only build inputs and call the layer object. No
-  transaction, no business rules — those live in the use case / user story.
-- **Controller as listener.** `listener: self` + `on_success:`/`on_failure:` means the layer
-  object stays caller-agnostic, and the controller renders in named callbacks. The same use
-  case is reused unchanged from GraphQL or tests.
-- **Reads vs writes.** `show` renders straight through a serializer; collection reads go
-  through an identity-scoped query object; only writes go through a use case.
-- **uuid + identity scoping.** Look-ups use the public identifier and are scoped to the
-  current identity, so authorization-by-construction backs up the explicit checks.
-- **Guards via `before_action`.** Request-shape and existence checks short-circuit with
-  rendered JSON:API errors before the action runs.
-- **Shared error handling.** Unexpected errors are caught by `V1::ErrorHandling`'s
-  `rescue_from`, not per-action rescues.
-- **Two flavours, one shape.** The HTML controller follows the identical listener pattern;
-  only the rendering vocabulary changes (flash/session/redirect vs serializers).
+- **Thin actions, nothing container-named.** Actions translate the request and call a
+  layer object. Writes go to the engine sibling story (engine-owned, safe to name);
+  reads resolve a query through the engine registry. No use case, form, query, or model
+  constant is named in the engine (ruling 15/16) — the lookup and the form both live
+  past the boundary.
+- **Controller as listener.** `listener: self` + `on_success:`/`on_failure:` means the
+  layer object stays caller-agnostic, and the controller renders in named callbacks. The
+  same story is reused unchanged from tests.
+- **Reads vs writes (CQS).** `show` resolves an authorization-scoped query and renders;
+  writes go through a story. The query's scope hides out-of-reach records, so off-limits
+  reads as not-found — no 403 oracle.
+- **uuid at the edges.** Look-ups use the public identifier; the scoping is the
+  credential's, applied where the query is constructed.
+- **Guards via `before_action`.** Request-shape checks short-circuit with rendered
+  JSON:API errors before the action runs; unexpected errors are caught by
+  `V1::ErrorHandling`'s `rescue_from`, not per-action rescues.
+- **Two flavours, one shape.** The HTML controller follows the identical listener
+  pattern; only the rendering vocabulary changes (flash/session/redirect vs serializers).

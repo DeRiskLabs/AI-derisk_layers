@@ -6,15 +6,20 @@
 - [ ] Lives in the right engine (`apis/v1/app/controllers/v1/...` for REST; the feature
       engine for HTML).
 - [ ] Inherits a base controller that includes error-handling + authorization concerns.
-- [ ] Actions are thin: parse → form/inputs → layer object → render in callbacks.
+- [ ] Actions are thin: parse → engine story (writes) / registry query (reads) → render
+      in callbacks.
+- [ ] Names no container constant (use case, query, form, model) — engine sibling story,
+      or query resolved through the engine registry, only (ruling 15/16). Scaffold the
+      slice with `bin/rails generate layers:api_endpoint <resource>/<action>`.
 
 
 ## Mutating actions
 
 - [ ] `before_action` guards validate request shape and existence.
-- [ ] JSON:API: builds a form from `permit`ted params (`parsed_params` merges the raw body).
-- [ ] Calls `UseCase.call(form:, listener: self, on_success:, on_failure:)` (or a user
-      story for orchestrated/HTML flows).
+- [ ] JSON:API: forwards `permit`ted raw params (`parsed_params` merges the raw body) to
+      the story — the use case builds the form, not the controller.
+- [ ] Calls `UserStories::<Engine>::....call(current_authorization:, **params, listener:
+      self, on_success:, on_failure:)`.
 - [ ] Public callback methods render success and failure responses — and nothing else does.
 - [ ] HTML: `flash.now` + `render` on failure, `flash` + `redirect_to` on success; messages
       via `I18n.t`; failure callbacks that ignore the payload take `(*)`.
@@ -23,8 +28,9 @@
 
 ## Reads
 
-- [ ] Simple show renders directly through a serializer.
-- [ ] Collections go through a memoized, identity-scoped query object.
+- [ ] Reads resolve a query through the engine registry
+      (`Engine.configuration.queries[:name].new(authorization: current_authorization)`),
+      then render through a serializer.
 
 
 ## Cross-cutting

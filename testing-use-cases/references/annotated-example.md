@@ -1,7 +1,8 @@
 # Annotated Example — Use Case Spec
 
-Neutral domain: `UseCases::Profiles::Update` — a use case that takes a validated `form`,
-updates the profile in a transaction, and reports via the listener.
+Neutral domain: `UseCases::Profiles::Update` — a use case that takes raw inputs, builds a
+form peer to validate and construct, updates the profile in a transaction, and reports via
+the listener.
 
 
 ## The Object Under Test
@@ -15,26 +16,27 @@ in [[authoring-use-cases]]:
 module UseCases
   module Profiles
     class Update < ApplicationUseCase
-      required :form
+      required :profile_id
+      optional :first_name, :last_name, :phone
 
       delegate :valid?, to: :form
-      delegate :profile, to: :form
 
       def call
         return failure(form: form) unless valid?
 
-        ActiveRecord::Base.transaction do
-          profile.update!(
-            first_name: form.first_name,
-            last_name: form.last_name,
-            phone: form.phone,
-          )
-        end
-
-        success(profile: profile)
-
+        ActiveRecord::Base.transaction { form.profile.save! }
+        success(profile: form.profile)
       rescue ActiveRecord::RecordInvalid
         failure(form: form)
+      end
+
+
+      private
+
+      def form
+        @form ||= Forms::Profiles::UpdateForm.new(
+          profile_id: profile_id, first_name: first_name, last_name: last_name, phone: phone,
+        )
       end
     end
   end
@@ -66,21 +68,16 @@ RSpec.describe UseCases::Profiles::Update do
   end
 
   # --- The use case's own inputs --------------------------------------------
-  # This use case declares `required :form`. The form is doubled: the use case only talks to
-  # it through a small interface (valid?, profile, the attribute readers), so we double
-  # exactly that interface.
+  # The use case takes RAW inputs and builds its form peer internally. The use case only
+  # talks to the form through a small interface (valid?, profile), so we double that
+  # interface and stub the construction the use case performs.
   let(:profile) { instance_spy('Profile') }
-  let(:form) do
-    instance_double(
-      'Forms::Profiles::UpdateForm',
-      valid?: true,
-      profile: profile,
-      first_name: 'Ada',
-      last_name: 'Lovelace',
-      phone: '+1 555-123-4567',
-    )
+  let(:form) { instance_double('Forms::Profiles::UpdateForm', valid?: true, profile: profile) }
+  let(:valid_use_case_args) do
+    { profile_id: 1, first_name: 'Ada', last_name: 'Lovelace', phone: '+1 555-123-4567' }
   end
-  let(:valid_use_case_args) { { form: form } }
+
+  before { allow(Forms::Profiles::UpdateForm).to receive(:new).and_return(form) }
 
   # --- Compose the params, with a single override point ----------------------
   let(:valid_params) { valid_listener_args.merge(valid_use_case_args) }
@@ -95,9 +92,8 @@ RSpec.describe UseCases::Profiles::Update do
     end
 
     context 'when successful' do
-      # One behaviour per example.
-      it 'updates the profile' do
-        expect(profile).to have_received(:update!)
+      it 'persists the profile' do
+        expect(profile).to have_received(:save!)
       end
 
       it 'notifies the listener of success' do
@@ -106,21 +102,18 @@ RSpec.describe UseCases::Profiles::Update do
     end
 
     context 'when validation fails' do
-      # Override exactly one input: an invalid form. Everything else is inherited.
-      let(:form) do
-        instance_double('Forms::Profiles::UpdateForm', valid?: false, profile: profile)
-      end
+      # Override exactly one thing: an invalid form. Everything else is inherited.
+      let(:form) { instance_double('Forms::Profiles::UpdateForm', valid?: false, profile: profile) }
 
       it 'notifies the listener of failure' do
         expect(listener).to have_received(on_failure_callback).with(form: form)
       end
     end
 
-    context 'when the update raises' do
+    context 'when the save raises' do
       # Stubbing belongs in `before`, never in `it`.
       before do
-        allow(profile).to receive(:update!)
-          .and_raise(ActiveRecord::RecordInvalid.new(profile))
+        allow(profile).to receive(:save!).and_raise(ActiveRecord::RecordInvalid.new(profile))
       end
 
       it 'notifies the listener of failure' do
@@ -137,12 +130,13 @@ end
 - **Spy listener + callback lets.** The object's public contract *is* the message it sends.
   Asserting `have_received(on_success_callback)` tests that contract directly; using the let
   name (not a literal `:on_success`) keeps the spec honest if defaults change.
-- **`params` layering.** `valid_listener_args.merge(valid_use_case_args)` → `valid_params`
-  → `params` means a context can override a single `let` (e.g. `form`) and leave the rest
-  intact, instead of reconstructing the whole argument hash.
+- **Raw inputs + stubbed form construction.** The use case takes raw inputs and builds its
+  form peer (ruling 16). The form is the collaborator, so we double its interface and stub
+  the `.new` the use case calls — `before { allow(Forms::...).to receive(:new)... }`. A
+  DB-backed variant (real form + factory profile) is equally valid for a container use case.
+- **`params` layering.** A context overrides a single `let` (e.g. `form`) and leaves the
+  rest intact, instead of reconstructing the whole argument hash.
 - **`describe '.call'` + `execute`.** The action is declared once; each `it` asserts one
   observable effect of that single run.
-- **Doubles match the used interface.** The form double declares only what the use case
-  calls (`valid?`, `profile`, the attribute readers).
 - **All three outcomes covered.** Success, invalid form, and persistence failure are the
   use case's whole contract — each gets a context ending in the right callback.

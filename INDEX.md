@@ -13,7 +13,8 @@ Using the layers gem in a Rails app. Assumes: derisk_common, derisk_ruby, derisk
 
 - [[authoring-components]] — bounded contexts as unbuilt gems in `components/` (root-constant interface, repository registry).
 - [[authoring-engines]] — operationally creating feature (`engines/*`) and API (`apis/*`) engines: generation, namespaces, mounting, bases, spec wiring.
-- [[authoring-controllers]] — REST/JSON:API controllers (thin; delegate to use cases).
+- [[authoring-controllers]] — REST/JSON:API controllers (thin; delegate to engine stories / registry queries).
+- [[authoring-api-endpoints]] — the layers:api_endpoint scaffold: one REST command endpoint as a container+engine vertical slice.
 - [[authoring-use-cases]] — single transactional writes (`UseCases::*`).
 - [[authoring-user-stories]] — orchestration objects (`UserStories::*`).
 - [[authoring-query-objects]] — scoped, composable reads (`Queries::*`).
