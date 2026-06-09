@@ -84,9 +84,9 @@ action; the engine initializer (container) binds the use case into the registry.
 
 | File | Home | You fill in |
 | --- | --- | --- |
-| use case | `app/lib/use_cases/<domain>/<action>.rb` | raw inputs, persistence in `execute!` |
+| use case | `app/lib/use_cases/<domain>/<action>.rb` | inputs, persistence in `execute!` |
 | form | `app/lib/forms/<domain>/<action>_form.rb` | accessors, validations, builders, whitelist |
-| user story | `apis/<engine>/app/lib/user_stories/<engine>/<domain>/<action>.rb` | the raw inputs forwarded to the use case |
+| user story | `apis/<engine>/app/lib/user_stories/<engine>/<domain>/<action>.rb` | the inputs forwarded to the use case |
 | controller (+action) | `apis/<engine>/app/controllers/<engine>/<resource>_controller.rb` | permitted params |
 | serializer | `apis/<engine>/app/serializers/<engine>/<resource>_serializer.rb` | exposed attributes |
 | route | `apis/<engine>/config/routes.rb` | (injected) |

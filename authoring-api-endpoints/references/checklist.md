@@ -8,13 +8,13 @@
       use-case registration in `config/initializers/<engine>.rb`.
 
 ## Container (use case + form)
-- [ ] Use case takes the raw inputs and builds its `Forms::` peer; persistence in a
+- [ ] Use case takes the inputs and builds its `Forms::` peer; persistence in a
       transaction ([[authoring-use-cases]]).
 - [ ] Form declares accessors, validations, builders, and the `report_full_errors_for`
       whitelist ([[authoring-layers-forms]]).
 
 ## Engine (story + controller + serializer)
-- [ ] Story forwards the raw inputs to the use case via the registry; names no container
+- [ ] Story forwards the inputs to the use case via the registry; names no container
       constant.
 - [ ] Controller action forwards `current_authorization` + permitted params to the story;
       callbacks render success and failure; no form built, no use case named.

@@ -10,7 +10,7 @@ Domain: a `POST /orders` create. TODOs are the semantics you fill.
 module UseCases
   module Orders
     class Create < ApplicationUseCase
-      required :name # TODO: the raw inputs this use case receives
+      required :name # TODO: the inputs this use case receives
 
       emits success: [:thing], failure: [:form] # TODO: name the success payload object
 
@@ -39,7 +39,7 @@ module UseCases
 end
 ```
 
-Raw inputs in; the form is a container peer built here ([[authoring-use-cases]]). The
+Inputs in; the form is a container peer built here ([[authoring-use-cases]]). The
 container can name `Forms::Orders::CreateForm` — they sit at the same level.
 
 
@@ -89,7 +89,7 @@ module UserStories
         end
 
         def use_case_options
-          {} # TODO: the raw inputs the use case requires (e.g. name:, email:)
+          {} # TODO: the inputs the use case requires (e.g. name:, email:)
         end
       end
     end

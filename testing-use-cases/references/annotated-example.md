@@ -1,6 +1,6 @@
 # Annotated Example — Use Case Spec
 
-Neutral domain: `UseCases::Profiles::Update` — a use case that takes raw inputs, builds a
+Neutral domain: `UseCases::Profiles::Update` — a use case that takes inputs, builds a
 form peer to validate and construct, updates the profile in a transaction, and reports via
 the listener.
 
@@ -130,7 +130,7 @@ end
 - **Spy listener + callback lets.** The object's public contract *is* the message it sends.
   Asserting `have_received(on_success_callback)` tests that contract directly; using the let
   name (not a literal `:on_success`) keeps the spec honest if defaults change.
-- **Raw inputs + stubbed form construction.** The use case takes raw inputs and builds its
+- **Inputs + stubbed form construction.** The use case takes inputs and builds its
   form peer (ruling 16). The form is the collaborator, so we double its interface and stub
   the `.new` the use case calls — `before { allow(Forms::...).to receive(:new)... }`. A
   DB-backed variant (real form + factory profile) is equally valid for a container use case.

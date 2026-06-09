@@ -68,9 +68,9 @@ Scaffold the object + spec pair with `bin/rails generate layers:use_case <domain
 ## Anatomy
 
 1. Inherit from `ApplicationUseCase`.
-2. Declare the **raw inputs** the operation needs with `required` / `optional` — not a
+2. Declare the **inputs** the operation needs with `required` / `optional` — not a
    pre-built form. Nothing upstream builds a form for you: a user story (the caller from
-   an engine) passes raw inputs, and engine delivery code cannot name a container form
+   an engine) passes inputs, and engine delivery code cannot name a container form
    anyway (ruling 16). The use case is the injected business operation; the form is a
    container **peer** it reaches for.
 3. When the operation validates and constructs persistable objects, build a `Forms::`

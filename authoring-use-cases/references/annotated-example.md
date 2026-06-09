@@ -1,6 +1,6 @@
 # Annotated Example — Use Case
 
-Neutral domain: `UseCases::Profiles::Update` — update a profile from raw inputs, reaching
+Neutral domain: `UseCases::Profiles::Update` — update a profile from inputs, reaching
 for a form peer to validate and construct. The companion spec is the annotated example in
 [[testing-use-cases]].
 
@@ -10,7 +10,7 @@ for a form peer to validate and construct. The companion spec is the annotated e
 module UseCases
   module Profiles
     class Update < ApplicationUseCase   # ApplicationUseCase < Layers::BaseLayer
-      # Raw inputs, not a pre-built form: nothing upstream builds one (ruling 16).
+      # Inputs, not a pre-built form: nothing upstream builds one (ruling 16).
       required :profile_id
       optional :first_name, :last_name, :phone
 
@@ -52,8 +52,8 @@ end
 
 ## Why these choices
 
-- **Raw inputs, form peer built internally.** A user story (the caller from an engine)
-  passes raw inputs and never builds a form; engine delivery code cannot name a container
+- **Inputs, form peer built internally.** A user story (the caller from an engine)
+  passes inputs and never builds a form; engine delivery code cannot name a container
   form anyway (ruling 16). The use case reaches for its `Forms::` peer itself. Validation,
   coercion, and construction live in the form ([[authoring-form-objects]]); the use case
   stays about the *write*. A use case that needs no validation skips the form entirely.

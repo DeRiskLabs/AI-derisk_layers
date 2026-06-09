@@ -83,8 +83,8 @@ let(:valid_params) { valid_listener_args.merge(valid_use_case_args) }
 let(:params) { valid_params }                           # contexts re-point :params or a leaf let
 ```
 
-A use case takes **raw inputs** and builds its form peer internally (ruling 16), so the
-args are the raw inputs — not a `form:`. Double the form interface and stub the
+A use case takes **inputs** and builds its form peer internally (ruling 16), so the
+args are the inputs — not a `form:`. Double the form interface and stub the
 construction the use case performs:
 
 ```ruby
