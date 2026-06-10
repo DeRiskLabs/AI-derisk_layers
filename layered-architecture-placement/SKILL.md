@@ -54,6 +54,7 @@ references/request-flow.md     # a request traced through the layers
 | Form object | Validate params; build domain objects | `valid?` + built objects | [[authoring-form-objects]] |
 | Query object | Scoped, composable reads | a relation / chainable query | [[authoring-query-objects]] |
 | Model | Data shape, integrity, intrinsic accessors | data | [[authoring-models]] |
+| View model | Shape a record/read for serialization (a PORO answering the resource's attribute methods) | the shaped object | (delivery edge) |
 | Serializer | Present data as JSON:API | response hash | [[authoring-serializers]] |
 
 
@@ -84,7 +85,12 @@ business logic, never the reverse.
 - Validating params and constructing objects to persist? → **form object**.
 - A read with scoping/joins reused across callers? → **query object**.
 - Data integrity / a tiny pure accessor? → **model**.
-- Shaping a response? → **serializer**.
+- A read that needs shaping before serialization — curated/derived fields, or a
+  no-model source like file-backed artifacts? → **view model** (a PORO wrapping the
+  record, answering the serializer's attribute methods). The query returns records, the
+  view shapes, the serializer formats — keep shaping out of both the query and the
+  controller.
+- Shaping a response into JSON:API? → **serializer**.
 
 
 ## Collaboration (write path)

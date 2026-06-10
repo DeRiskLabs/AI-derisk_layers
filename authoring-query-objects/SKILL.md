@@ -138,6 +138,23 @@ end
 ```
 
 
+## Non-ActiveRecord Relations (duck-typed)
+
+A query object does **not** require ActiveRecord. The wrapped relation is whatever the
+configured relation adapter accepts. With `Layers::Adapters::Relation::DuckType` (set in an
+initializer: `Layers.configure { |c| c.relation_adapter = Layers::Adapters::Relation::DuckType }`)
+any object answering `#where` is a valid relation, so a query can wrap a non-AR source —
+e.g. an in-memory collection of file-backed artifacts — while keeping the same chainable
+contract: refiners return `self`, terminators (`all`, `find_by`, `count`, …) delegate to
+the relation. Such a subclass builds its relation in `initialize` / `build_relation_defaults!`
+(passing it to `super`) rather than naming a model via `relation_class`.
+
+The relation object itself just implements the messages the query uses (`where`, `order`,
+and the terminators), over whatever backing store it likes. Reads that need presentation
+shaping afterwards belong in a **view model**, not the query (see
+[[layered-architecture-placement]]).
+
+
 ## When to Extract One
 
 A model may carry a few simple scopes ([[authoring-models]]); the moment scopes multiply,
