@@ -4,7 +4,7 @@ title: Authoring Components
 description: How to create and structure a component - a bounded context packaged as an unbuilt gem under components/, with a root-constant public interface and a boot-filled repository registry. Use when creating a component, deciding between component, engine, and api, or wiring a component into the container application.
 category: architecture
 status: active
-version: 1.2
+version: 1.3
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - a single layer object inside the app
   - models or migrations
 user_invocable: true
-last_reviewed_at: 2026-06-06
+last_reviewed_at: 2026-06-10
 ---
 
 
@@ -256,6 +256,66 @@ Billing.configuration.repo = { invoice: fake_invoices }
 
 Use cases inside the component are tested with [[testing-use-cases]]; the suite runs
 without a database, so the swapped-in fakes stand in for repositories.
+
+**Root spec vs configuration spec.** The root `billing_spec.rb` pins the component's
+**public interface** — the root-constant methods — and nothing about plumbing. The
+`Configuration`'s registry defaulting and delegation get their own
+`configuration_spec.rb`. Test only what the `Configuration` adds — that `#repo`
+**defaults** to the component's `RepositoryRegistry`, and that `register_repository(s)`
+**delegates** to it — and **never re-test `Layers::BaseRegistry`** (registration,
+constantize-per-access): the `layers` gem owns those tests. This is [[ruby-testing]]'s
+"Complete, Fast, Ours" applied to a slice — test the wiring you own, double the gem
+you don't:
+
+```ruby
+RSpec.describe Billing::Configuration do
+  subject(:configuration) { Billing.configuration }
+
+  describe '#repo' do
+    it { is_expected.to respond_to(:repo) }
+    it { is_expected.to respond_to(:repo=) }
+
+    context 'when no repository registry is injected' do
+      it 'defaults to the component RepositoryRegistry' do
+        expect(configuration.repo).to be_a(Billing::RepositoryRegistry)
+      end
+    end
+  end
+
+  context 'with an injected repository registry' do
+    # Do not re-test Layers::BaseRegistry here — the gem owns that.
+    let(:repo) do
+      instance_double(
+        Billing::RepositoryRegistry,
+        register_repository: nil,
+        register_repositories: nil
+      )
+    end
+
+    before { Billing.configure { |c| c.repo = repo } }
+
+    describe '#register_repository' do
+      let(:entry) { { invoice: 'Invoice' } }
+
+      execute { configuration.register_repository(**entry) }
+
+      it 'delegates to the repository registry' do
+        expect(repo).to have_received(:register_repository).with(**entry)
+      end
+    end
+
+    describe '#register_repositories' do
+      let(:entries) { { customer: 'Customer', payment: 'Payment' } }
+
+      execute { configuration.register_repositories(**entries) }
+
+      it 'delegates to the repository registry' do
+        expect(repo).to have_received(:register_repositories).with(**entries)
+      end
+    end
+  end
+end
+```
 
 
 ## Avoid

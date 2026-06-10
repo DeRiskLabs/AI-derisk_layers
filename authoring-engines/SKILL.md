@@ -4,7 +4,7 @@ title: Authoring Engines
 description: How to operationally create a mountable engine - feature engines under engines/, API engines under apis/ - covering generation, namespace stance, mounting, engine-local layer bases, and spec wiring. Use when adding a new engine or bringing one to house shape.
 category: architecture
 status: active
-version: 2.0
+version: 2.1
 applies_to:
   - Ruby
   - Rails
@@ -21,7 +21,7 @@ anti_triggers:
   - pure domain context (component)
   - a single endpoint in an existing engine
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: 2026-06-10
 ---
 
 
@@ -189,7 +189,8 @@ engines/invoicing/
     ├── spec_helper.rb           # always_execute + RSpec config
     ├── rails_helper.rb          # boots spec/dummy
     ├── dummy/config/            # application.rb (explicit root), environment, routes
-    ├── invoicing_spec.rb        # generated root spec — registries present
+    ├── invoicing_spec.rb        # generated root spec — the engine's public interface
+    ├── configuration_spec.rb    # registry defaulting + delegation (registry doubled)
     ├── use_cases/invoicing/     # the engine's layer objects
     ├── user_stories/invoicing/
     └── requests/                # the engine's endpoints, against the dummy
@@ -212,6 +213,52 @@ engines/invoicing/
 - Real crossings are validated at delivery level in the **container's** suite
   (doctrine ruling 13) — the engine's isolated suite proves the engine against its
   declared contracts; the container's acceptance specs prove the bindings.
+
+**Root spec vs configuration spec.** The root `invoicing_spec.rb` pins the engine's
+**public interface** — its boundary methods — and nothing about plumbing. The
+`Configuration`'s registry defaulting and delegation get their own
+`configuration_spec.rb`. Test only what the slice's `Configuration` adds — that each
+registry **defaults** to the engine's own registry class, and that `register_*`
+**delegates** to it — and **never re-test `Layers::BaseRegistry`** (registration,
+constantize-per-access): the `layers` gem owns those tests. This is [[ruby-testing]]'s
+"Complete, Fast, Ours" applied to a slice — test the wiring you own, double the gem
+you don't:
+
+```ruby
+RSpec.describe Invoicing::Configuration do
+  subject(:configuration) { Invoicing.configuration }
+
+  describe '#use_cases' do
+    it { is_expected.to respond_to(:use_cases) }
+    it { is_expected.to respond_to(:use_cases=) }
+
+    context 'when no use-case registry is injected' do
+      it 'defaults to the engine UseCaseRegistry' do
+        expect(configuration.use_cases).to be_a(Invoicing::UseCaseRegistry)
+      end
+    end
+  end
+
+  context 'with an injected use-case registry' do
+    # Do not re-test Layers::BaseRegistry here — the gem owns that.
+    let(:use_cases) do
+      instance_double(Invoicing::UseCaseRegistry, register_use_case: nil)
+    end
+
+    before { Invoicing.configure { |c| c.use_cases = use_cases } }
+
+    describe '#register_use_case' do
+      let(:entry) { { create_invoice: 'UseCases::Invoices::Create' } }
+
+      execute { configuration.register_use_case(**entry) }
+
+      it 'delegates to the use-case registry' do
+        expect(use_cases).to have_received(:register_use_case).with(**entry)
+      end
+    end
+  end
+end
+```
 
 Layer objects follow their usual testing skills ([[testing-use-cases]],
 [[testing-user-stories]]) with registry fakes in place of factories; delivery
