@@ -42,8 +42,8 @@ module Accounts
 end
 ```
 
-- `register_identity` is a **command**: thin pass-through to the use case, the port
-  of entry. Its return value is part of no contract.
+- `register_identity` is a **command**: the public boundary-crossing protocol, thin
+  pass-through to the use case. Its return value is part of no contract.
 - `profiles_for` is a collection **query**: returns an enumerable, possibly empty,
   never nil.
 - `profile` is a singular query: the object or nil. Whether either wraps a query

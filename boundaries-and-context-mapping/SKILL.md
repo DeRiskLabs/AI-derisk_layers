@@ -27,17 +27,21 @@ last_reviewed_at: 2026-06-06
 
 # Boundaries and Context Mapping
 
-Where boundaries go is **the architect's judgment call**. This skill gives the inputs
-to that judgment and the discipline around it — it is not an algorithm. The hard rule
-for agents: **when boundary placement is ambiguous, ask the architect. Never invent a
-boundary silently.**
+This skill applies [[bounded-contexts]] to a Rails/Layers modular monolith. Use it
+when deciding whether a domain cluster should stay where it is, become a component,
+become an engine, move under `apis/`, split, or merge.
+
+Where boundaries go is the architect's judgment call. This skill gives inputs to that
+judgment; it is not an algorithm. When boundary placement is ambiguous, ask the
+architect. Never invent a boundary silently.
 
 
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_ruby/object-oriented-boundaries/SKILL.md
-common_agent_skills/derisk_layers/rails-app-architecture/SKILL.md
+[[bounded-contexts]]
+[[cross-boundary-communication]]
+[[rails-app-architecture]]
 ```
 
 Supporting references in this skill:
@@ -53,11 +57,10 @@ Packaging a decided boundary: [[authoring-components]] (the three-homes table) o
 
 ## The Monolith's Named Scales
 
-Bounded contexts are fractal (see object-oriented-boundaries); this architecture
-names four scales of them:
+This architecture names four useful scales:
 
 ```text
-a layer object                       # use case, query object, form
+a layer object                       # use case, query object, form, user story
 a domain cluster in app/lib          # a namespace of layer objects
 a slice: component / engine / api    # an unbuilt gem with a hard boundary
 the application                      # one bounded context to its users
@@ -65,16 +68,17 @@ the application                      # one bounded context to its users
 
 A boundary decision is usually about the third scale: when does a domain cluster
 deserve a slice, and which home does it get. The home question is settled by the
-three-homes table in [[authoring-components]]; *this* skill is about whether and
-where to draw the line at all.
+three-homes table in [[authoring-components]]. This skill is about whether and where
+to draw the line at all.
 
 
 ## Judgment Inputs
 
 In rough priority order — inputs, not rules:
 
-1. **One business concept.** A context's one thing should be nameable without "and":
-   *everything to do with user registration* qualifies, however many files it takes.
+1. **One business concept.** A context's one thing should be nameable at its level of
+   abstraction: *everything to do with user registration* qualifies, however many
+   files it takes.
 2. **Language shift.** When the same word means different things ("account" to
    identity vs to billing), you are looking at two contexts.
 3. **Change-together clusters.** Code that always changes in the same commit belongs
@@ -87,7 +91,7 @@ In rough priority order — inputs, not rules:
    call gravitate to components.
 
 
-## Composition: Decomposing Without Telling Anyone
+## Composition
 
 A context that grows heavy is decomposed **inside its boundary** — the decomposition
 is an implementation detail to every outside caller.
@@ -98,9 +102,10 @@ multiple engines (one for everything auth, another for the remaining resources);
 mounting recombines them, and to every API client there is still exactly one set of
 APIs. Nothing outside the boundary changed.
 
-The same move works at every scale: registration may internally become role
-management + authentication + authorization, and remain `registration` to callers.
-If a split forces callers to change, it was a boundary break, not a decomposition.
+The same move works at every scale. Registration may internally become role
+management, authentication, and authorization while remaining `Registration` to
+callers. If a split forces callers to change, it was a boundary break, not a
+decomposition.
 
 
 ## Contexts Own Behaviour, Not Tables

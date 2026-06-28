@@ -49,10 +49,10 @@ writing.
 2. **Thin framework edges, fat domain objects.** Controllers and GraphQL endpoints only
    translate and render. Behaviour lives in layer objects (use cases, user stories, forms,
    query objects) built on `Layers::BaseLayer` — see [[layered-architecture-placement]].
-   The user story is the port between the two: the boundary of a user interaction, out of
-   the delivery layer into business logic and back. The use case is the entry point to the
-   business logic itself — callable by a user story, a job, or any other actor, and it
-   never calls a user story.
+   In this house style, the user story is the public crossing protocol for a user
+   interaction: out of the delivery layer into business logic and back. The use case is
+   the entry point to the business logic itself — callable by a user story, a job, or
+   any other actor, and it never calls a user story.
 3. **Message passing over return values — for commands.** Use cases and user stories
    report outcomes by calling back a `listener` (`success`/`failure`), so the same object
    serves REST, GraphQL, and tests unchanged. Queries are the deliberate exception:
@@ -76,7 +76,9 @@ writing.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/layered-architecture-placement/SKILL.md
+[[bounded-contexts]]
+[[cross-boundary-communication]]
+[[layered-architecture-placement]]
 ```
 
 Supporting references in this skill:

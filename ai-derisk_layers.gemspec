@@ -21,9 +21,9 @@ Gem::Specification.new do |spec|
     'rubygems_mfa_required' => 'true',
   }
 
-  spec.files = Dir['INDEX.md', 'LICENSE.txt', '*/**/*'].select { |f| File.file?(f) }
+  spec.files = Dir['INDEX.md', 'GEMINI.md', 'LICENSE.txt', '*/**/*'].select { |f| File.file?(f) }
 
-  spec.require_paths = []
+  spec.require_paths = ['.']
 
   spec.add_dependency 'ai-derisk_rails', '~> 0.1'
 end

@@ -41,9 +41,9 @@ where anything goes; you supply the semantics.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/authoring-engines/SKILL.md
-common_agent_skills/derisk_layers/authoring-use-cases/SKILL.md
-common_agent_skills/derisk_layers/authoring-controllers/SKILL.md
+[[authoring-engines]]
+[[authoring-use-cases]]
+[[authoring-controllers]]
 ```
 
 Supporting references in this skill:

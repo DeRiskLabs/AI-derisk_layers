@@ -82,7 +82,7 @@ Own abstractions always live under `app/lib/<abstraction>/` — never invent new
 skill:
 
 ```text
-common_agent_skills/derisk_rails/app-lib-placement/SKILL.md
+[[app-lib-placement]]
 ```
 
 The layers-specific overlay is choosing WHICH boundary's `app/lib`: the one that owns the

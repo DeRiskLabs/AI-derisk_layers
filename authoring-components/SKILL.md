@@ -38,7 +38,7 @@ on its root constant, out through listener callbacks.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/rails-app-architecture/SKILL.md
+[[rails-app-architecture]]
 ```
 
 Supporting references in this skill:
@@ -135,8 +135,8 @@ end
 ```
 
 - The interface splits into **commands and queries** (see
-  [[cross-context-communication]]). Commands change state: use cases are their ports
-  of entry, the root-constant methods thin pass-throughs, outcomes travelling back
+  [[cross-context-communication]]). Commands change state: the root-constant methods
+  are the public protocol, use cases do the work behind them, and outcomes travel back
   through the listener (`success`/`failure` callbacks) — a command's return value is
   never used. Queries are side-effect-free asks returning the answer itself: an
   enumerable (possibly empty, never nil) for collection questions, the object or nil

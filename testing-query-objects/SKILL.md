@@ -38,8 +38,8 @@ The reference suite has no query specs — that is drift. Every query object get
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_ruby/ruby-testing/SKILL.md
-common_agent_skills/derisk_ruby/always-execute-rspec/SKILL.md
+[[ruby-testing]]
+[[always-execute-rspec]]
 ```
 
 Supporting references in this skill:

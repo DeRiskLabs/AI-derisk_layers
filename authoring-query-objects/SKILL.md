@@ -34,7 +34,7 @@ small interface, so controllers/user stories never assemble joins and conditions
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/layered-architecture-placement/SKILL.md
+[[layered-architecture-placement]]
 ```
 
 Supporting references in this skill:

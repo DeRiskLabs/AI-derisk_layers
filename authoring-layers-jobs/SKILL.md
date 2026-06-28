@@ -31,8 +31,8 @@ queue semantics. `Layers::BaseJob` makes that declarative.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_rails/authoring-jobs/SKILL.md
-common_agent_skills/derisk_rails/testing-jobs/SKILL.md
+[[authoring-jobs]]
+[[testing-jobs]]
 ```
 
 

@@ -33,7 +33,7 @@ never re-implements it.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_rails/authoring-form-objects/SKILL.md
+[[authoring-form-objects]]
 ```
 
 

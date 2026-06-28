@@ -33,7 +33,9 @@ follow the specific authoring skill.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/rails-app-architecture/SKILL.md
+[[bounded-contexts]]
+[[cross-boundary-communication]]
+[[rails-app-architecture]]
 ```
 
 Supporting references in this skill:
@@ -58,16 +60,14 @@ references/request-flow.md     # a request traced through the layers
 | Serializer | Present data as JSON:API | response hash | [[authoring-serializers]] |
 
 
-## Why a User Story and a Use Case (Ports & Adapters)
+## Why a User Story and a Use Case
 
 The two layers behave identically — both inherit `Layers::BaseLayer` and report via
 `success`/`failure` — but they exist for different hexagonal reasons:
 
-- A **user story** is the boundary of a user interaction: the port out of the delivery
-  layer (controller stack, GraphQL endpoint, any user interaction point) into the
-  business-logic layer and back. That is *why* a controller or endpoint calls a user story —
-  crossing it exits Rails/GraphQL entirely, and nothing below it knows the delivery
-  mechanism.
+- A **user story** is the public crossing protocol for a user interaction. A controller
+  or endpoint calls a user story to exit Rails/GraphQL and enter business logic; nothing
+  below it knows the delivery mechanism.
 - A **use case** is the entry point to business logic. It performs or coordinates the work
   inside its bounded context and calls back to its listener once that work is complete. Its
   caller can be a user story, a job, or any other actor in the system.

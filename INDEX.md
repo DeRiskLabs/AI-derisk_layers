@@ -1,6 +1,6 @@
 # derisk_layers
 
-Using the layers gem in a Rails app. Assumes: derisk_common, derisk_ruby, derisk_rails.
+Using the layers gem in a Rails app. Assumes: derisk_common, derisk_foundations, derisk_ruby, derisk_rails.
 
 ## Architecture (read first)
 

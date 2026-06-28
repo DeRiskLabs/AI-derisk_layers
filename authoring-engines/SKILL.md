@@ -43,8 +43,8 @@ component ([[authoring-components]]).
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/rails-app-architecture/SKILL.md
-common_agent_skills/derisk_layers/rails-app-architecture/references/engine-layout.md
+[[rails-app-architecture]]
+[[rails-app-architecture]] reference `references/engine-layout.md`
 ```
 
 Supporting references in this skill:

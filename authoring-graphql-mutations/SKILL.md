@@ -36,8 +36,8 @@ via `ApplicationMutation`) supplies all the machinery.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/authoring-graphql/SKILL.md
-common_agent_skills/derisk_layers/authoring-user-stories/SKILL.md
+[[authoring-graphql]]
+[[authoring-user-stories]]
 ```
 
 Supporting references in this skill:

@@ -38,7 +38,7 @@ caller can be a user story, a job, or any other actor in the system.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/layered-architecture-placement/SKILL.md
+[[layered-architecture-placement]]
 ```
 
 Supporting references in this skill:

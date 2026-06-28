@@ -31,16 +31,16 @@ behaviour**: find the records, authorize the actor, then compose forms, use case
 objects to satisfy the request. It is the entry point a delivery mechanism (GraphQL endpoint,
 controller) drives, and it reports via message passing.
 
-In ports-and-adapters terms, a user story is **the boundary of the user interaction**: the
-way out of the delivery layer (controller stack, GraphQL endpoint, any user interaction
-point) into the business-logic layer and back. That is why the delivery adapter calls a
-user story — crossing it exits Rails/GraphQL entirely.
+In boundary terms, a user story is the public crossing protocol for a user interaction:
+the way out of the delivery layer (controller stack, GraphQL endpoint, any user
+interaction point) into the business-logic layer and back. That is why the delivery
+adapter calls a user story — crossing it exits Rails/GraphQL entirely.
 
 
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/layered-architecture-placement/SKILL.md
+[[layered-architecture-placement]]
 ```
 
 Supporting references in this skill:

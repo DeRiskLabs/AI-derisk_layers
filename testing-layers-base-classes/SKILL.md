@@ -39,9 +39,9 @@ app defines over them (`BaseUseCase`, `BaseUserStory`, `ApplicationQuery`,
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_ruby/testing-base-classes/SKILL.md
-common_agent_skills/derisk_ruby/ruby-testing/SKILL.md
-common_agent_skills/derisk_ruby/always-execute-rspec/SKILL.md
+[[testing-base-classes]]
+[[ruby-testing]]
+[[always-execute-rspec]]
 ```
 
 The general skill defines the mechanics (anonymous includers, the contract list, the

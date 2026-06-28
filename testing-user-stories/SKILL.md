@@ -37,10 +37,10 @@ message passing to a `listener`.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_ruby/ruby-testing/SKILL.md
-common_agent_skills/derisk_ruby/always-execute-rspec/SKILL.md
-common_agent_skills/derisk_layers/testing-use-cases/SKILL.md
-common_agent_skills/derisk_layers/testing-use-cases/references/doubles-and-matchers.md
+[[ruby-testing]]
+[[always-execute-rspec]]
+[[testing-use-cases]]
+[[testing-use-cases]] reference `references/doubles-and-matchers.md`
 ```
 
 Supporting references in this skill:

@@ -38,8 +38,8 @@ redirects.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/rails-app-architecture/SKILL.md
-common_agent_skills/derisk_layers/authoring-use-cases/SKILL.md
+[[rails-app-architecture]]
+[[authoring-use-cases]]
 ```
 
 Supporting references in this skill:

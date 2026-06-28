@@ -37,8 +37,8 @@ provides all the machinery.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_layers/rails-app-architecture/SKILL.md
-common_agent_skills/derisk_layers/authoring-user-stories/SKILL.md
+[[rails-app-architecture]]
+[[authoring-user-stories]]
 ```
 
 Authoring the endpoints themselves:

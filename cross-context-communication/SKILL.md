@@ -1,7 +1,7 @@
 ---
 name: cross-context-communication
-title: Cross-Context Communication
-description: The mechanics of crossing a bounded-context boundary - commands via the use-case pattern with listener callbacks, queries as side-effect-free asks returning the answer itself. Use when one context calls another, when designing a context's public interface, or when evolving a boundary contract.
+title: Layers Cross-Context Communication
+description: Layers-specific mechanics of crossing a bounded-context boundary - commands via the use-case pattern with listener callbacks, queries as side-effect-free asks returning the answer itself. Use in a Layers-based Rails app when one context calls another, when designing a context's public interface, or when evolving a boundary contract.
 category: architecture
 status: active
 version: 1.0
@@ -26,6 +26,8 @@ last_reviewed_at: 2026-06-06
 
 # Cross-Context Communication
 
+This is the Layers implementation of [[cross-boundary-communication]].
+
 Every crossing of a bounded-context boundary is one of two things:
 
 | | Command | Query |
@@ -43,8 +45,9 @@ domain answer itself, never an object carrying success/failure semantics.
 ## Required Reading
 
 ```text
-common_agent_skills/derisk_ruby/object-oriented-boundaries/SKILL.md
-common_agent_skills/derisk_layers/boundaries-and-context-mapping/SKILL.md
+[[cross-boundary-communication]]
+[[object-oriented-boundaries]]
+[[boundaries-and-context-mapping]]
 ```
 
 Supporting references in this skill:
@@ -75,7 +78,8 @@ Accounts.register_identity(form: form, listener: self)
 
 ### The callee's side
 
-- The root-constant method is a thin pass-through to a use case — the port of entry:
+- The root-constant method is a thin pass-through to a use case. This public method is
+  the boundary-crossing protocol:
 
   ```ruby
   module Accounts
