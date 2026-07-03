@@ -22,7 +22,7 @@ anti_triggers:
   - model spec
   - request spec
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 
@@ -60,6 +60,13 @@ The listener setup, the `params` layering
 `describe '.call'` + `execute { user_story.call }` structure, and one-expectation `it`s are
 **identical** to [[testing-use-cases]]. Read that skill for the mechanics; this skill covers
 what is specific to user stories.
+
+Like use cases, these are **fast, message-passing unit specs — no database** (engine-resident
+stories always; see §4). A user story orchestrates **use cases and/or query objects** and
+reports via the listener; the spec asserts the messages it sends to those collaborators, not
+that a row persisted. Real persistence and real wiring are proven end-to-end by the
+container's acceptance tests defined in [[testing-rails-requests]] — that layer is the
+backstop that makes these fast units safe.
 
 
 ## What Is Specific to User Stories
@@ -106,7 +113,11 @@ what is specific to user stories.
 
    Aftermath assertions become outgoing-command assertions
    (`expect(update_use_case).to have_received(:call).with(hash_including(article: article))`);
-   the real binding is proven by the container's delivery-level acceptance specs.
+   the real binding is proven by the container's delivery-level acceptance specs. This
+   swap-and-assert-the-message approach is the **sanctioned layered-testing doctrine**, not
+   coupling to fix: the fast unit is correct *because* the shared registry fakes are
+   contract-tested and the container acceptance specs prove the wiring (both defined in
+   [[testing-rails-requests]]) — write it deliberately.
 
 5. **Container stories may use the database.** A story living in the container app touches
    real collaborators, so `FactoryBot.create` + `reload` reads cleanly there:
@@ -125,7 +136,11 @@ what is specific to user stories.
    ```
 
 6. **Composed use cases / queries can be mocked.** When a story delegates to a use case, stub
-   its constructor and assert the message, exactly as in [[testing-use-cases]].
+   its constructor and assert the message, exactly as in [[testing-use-cases]]. Asserting the
+   message passed to a composed collaborator is sanctioned layered-testing doctrine — the
+   contract-tested shared fake plus the container acceptance specs (both defined in
+   [[testing-rails-requests]]) make the fast unit correct; it is intentional, not coupling to
+   remove.
 
 
 ## Avoid

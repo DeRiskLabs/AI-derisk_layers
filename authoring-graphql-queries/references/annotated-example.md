@@ -84,7 +84,7 @@ end
 
 Compact — authored per [[authoring-user-stories]]. **Scoping lives here**, driven by
 `current_authorization`, and the lookup goes through the engine's injected query-object
-registry — engine code never names container constants (doctrine ruling 15):
+registry — engine code never names container constants:
 
 ```ruby
 # frozen_string_literal: true

@@ -2,7 +2,7 @@
 name: authoring-query-objects
 title: Authoring Query Objects
 description: How to write a query object - a class that encapsulates a scoped, composable ActiveRecord query behind a small interface. Use when adding or changing classes under app/lib/queries.
-category: architecture
+category: authoring
 status: active
 version: 1.3
 applies_to:
@@ -21,7 +21,7 @@ anti_triggers:
   - user story
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 

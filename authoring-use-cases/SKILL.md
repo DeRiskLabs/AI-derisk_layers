@@ -2,7 +2,7 @@
 name: authoring-use-cases
 title: Authoring Use Cases
 description: How to write a use-case object - a Layers::BaseLayer subclass that performs one transactional unit of work and reports via success/failure. Use when adding or changing classes under app/lib/use_cases.
-category: architecture
+category: authoring
 status: active
 version: 1.6
 applies_to:
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-08
+last_reviewed_at: "2026-06-08"
 ---
 
 
@@ -71,7 +71,7 @@ Scaffold the object + spec pair with `bin/rails generate layers:use_case <domain
 2. Declare the **inputs** the operation needs with `required` / `optional` — not a
    pre-built form. Nothing upstream builds a form for you: a user story (the caller from
    an engine) passes inputs, and engine delivery code cannot name a container form
-   anyway (ruling 16). The use case is the injected business operation; the form is a
+   anyway. The use case is the injected business operation; the form is a
    container **peer** it reaches for.
 3. When the operation validates and constructs persistable objects, build a `Forms::`
    peer from the inputs and `delegate :valid?, to: :form`. (A use case that needs no
@@ -88,6 +88,8 @@ module UseCases
     class Update < ApplicationUseCase
       required :profile_id
       optional :first_name, :last_name
+
+      emits success: [:profile], failure: [:form]
 
       delegate :valid?, to: :form
 
@@ -120,13 +122,18 @@ sit at the same level and collaborate freely) — see [[authoring-layers-forms]]
 ## Rules
 
 - One use case = one action. If you reach for "and", split it (and compose from a user story).
-- Declarations are per-class: `required`/`optional`, `observer`, and `default_callbacks`
-  apply only to the declaring class — nothing inherits. State the complete contract in
-  the concrete class; keep base classes behavioural (includes, shared private helpers).
+- Declarations are per-class: `required`/`optional`, `emits`, `observer`, and
+  `default_callbacks` apply only to the declaring class — nothing inherits. State the complete
+  contract in the concrete class; keep base classes behavioural (includes, shared private
+  helpers).
 - Report **only** through `success(...)` / `failure(...)`; never return ad-hoc values or
   raise out of `#call` for expected failures.
 - Keep keyword payloads stable and meaningful (`success(account:)`, `failure(form:)`) — they
   are the contract the listener depends on.
+- Declare those outputs with `emits success: [...], failure: [...]`; the keys must match the
+  payloads your `success`/`failure` calls carry. The gem verifies the wired listener's
+  callbacks and the emitted keys against this declaration at construction, so a mis-wired
+  crossing fails at boot rather than at runtime.
 - A failure payload always carries the means to render errors: an object responding to
   `.errors` (usually the form) or an errors collection itself.
 - Side effects (emails, jobs) belong on observers or are triggered by the caller, not buried
@@ -140,7 +147,7 @@ sit at the same level and collaborate freely) — see [[authoring-layers-forms]]
 ## Avoid
 
 - validating or coercing inline when a form peer should — push validation into a `Forms::`
-  peer the use case builds (do not, however, expect a pre-built form to arrive: ruling 16).
+  peer the use case builds (do not, however, expect a pre-built form to arrive).
 - doing reads/queries a query object should own (see [[authoring-query-objects]]).
 - multiple responsibilities; orchestration across several use cases belongs in a user story
   ([[authoring-user-stories]]).

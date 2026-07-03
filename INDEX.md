@@ -31,4 +31,4 @@ Using the layers gem in a Rails app. Assumes: derisk_common, derisk_foundations,
 - [[testing-query-objects]] — DB-backed boundary specs for query objects.
 - [[testing-user-stories]] — orchestration/user-story specs.
 - [[testing-graphql]] — GraphQL acceptance specs (the ONLY GraphQL spec layer).
-- [[testing-layers-base-classes]] — the Layers::BaseLayer family: gem base classes, DSL mixins, app base classes.
+- [[testing-layers-base-classes]] — testing an app base class you define over a Layers base: pin only what your base class adds, and assert its endowment behaviourally.

@@ -9,7 +9,7 @@
 - [ ] Actions are thin: parse → engine story (writes) / registry query (reads) → render
       in callbacks.
 - [ ] Names no container constant (use case, query, form, model) — engine sibling story,
-      or query resolved through the engine registry, only (ruling 15/16). Scaffold the
+      or query resolved through the engine registry, only. Scaffold the
       slice with `bin/rails generate layers:api_endpoint <resource>/<action>`.
 
 

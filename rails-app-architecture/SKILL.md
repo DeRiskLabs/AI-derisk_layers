@@ -21,7 +21,7 @@ triggers:
 anti_triggers:
   - non-Ruby work
 user_invocable: true
-last_reviewed_at: 2026-06-08
+last_reviewed_at: "2026-06-08"
 ---
 
 
@@ -137,7 +137,7 @@ What are you building?
 │     │       then [[authoring-use-cases]]
 │     ├─ validates params and builds domain objects?
 │     │     → bin/rails generate layers:form <domain>/<action>
-│     │       then [[authoring-layers-forms]] / [[authoring-form-objects]]
+│     │       then [[authoring-layers-forms]] (which builds on [[authoring-form-objects]])
 │     └─ a scoped, composable read?
 │           → bin/rails generate layers:query_object <name>
 │             then [[authoring-query-objects]]

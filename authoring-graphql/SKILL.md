@@ -2,7 +2,7 @@
 name: authoring-graphql
 title: Authoring GraphQL Endpoints
 description: Hub for the GraphQL delivery layer - engine anatomy, base classes wiring Layers::Graphql::BaseEndpoint, base and domain types, schema wiring, and the acceptance-only testing strategy. Use when adding or changing files under an apis/graph engine.
-category: architecture
+category: authoring
 status: active
 version: 2.4
 applies_to:
@@ -22,7 +22,7 @@ anti_triggers:
   - use case internals
   - model logic
 user_invocable: true
-last_reviewed_at: 2026-06-04
+last_reviewed_at: "2026-06-04"
 ---
 
 
@@ -161,7 +161,7 @@ user story end to end.
 
 - Do NOT write unit specs for concrete mutations, resolvers, or types.
 - The machinery — `Layers::Graphql::BaseEndpoint` and the DSL mixins — is tested
-  exhaustively in the layers gem ([[testing-layers-base-classes]]).
+  exhaustively in the layers gem's own suite (not something an app spec re-covers).
 - The behaviour is unit-tested in the user story's spec ([[testing-user-stories]]).
 
 

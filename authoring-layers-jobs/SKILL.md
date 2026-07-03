@@ -2,7 +2,7 @@
 name: authoring-layers-jobs
 title: Authoring Jobs with Layers
 description: The layers overlay on job authoring - Layers::BaseJob declares its use case, performs with the job as listener, maps failure to JobFailed for queue retry, and may declare fire_and_forget. Use when writing jobs in an application using the layers gem.
-category: architecture
+category: authoring
 status: active
 version: 1.0
 applies_to:
@@ -18,7 +18,7 @@ triggers:
 anti_triggers:
   - generic job conventions (see derisk_rails authoring-jobs)
 user_invocable: true
-last_reviewed_at: 2026-06-06
+last_reviewed_at: "2026-06-06"
 ---
 
 

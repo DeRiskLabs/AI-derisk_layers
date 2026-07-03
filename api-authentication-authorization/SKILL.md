@@ -20,7 +20,7 @@ triggers:
 anti_triggers:
   - identity domain modelling itself
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 
@@ -35,7 +35,7 @@ Two different questions, two different homes:
 
 `current_authorization` — the security credential — is the actor vocabulary
 everywhere (never `current_user`, and never a raw identity travelling on its own;
-where an identity or role is needed, the credential answers — doctrine ruling 15).
+where an identity or role is needed, the credential answers).
 Authentication will ultimately be its own engine backed by an authorization gem;
 until that lands, the engine edge derives the credential as shown below.
 
@@ -112,6 +112,15 @@ Every endpoint spec states its security posture (the shared examples in
 [[testing-rails-requests]]'s shared infrastructure): an-authenticated-route /
 a-public-route, with real tokens via the auth helpers. GraphQL acceptance specs
 exercise context the same way ([[testing-graphql]]).
+
+**The auth stub in the layered doctrine.** An engine's fast, schema-less unit specs
+cannot mint real tokens, so they stub the credential — a shared fake standing in for
+the authenticated actor, keyed on `current_authorization` (the credential above).
+Because that fake is *shared and reused*, it is contract-tested by the container
+against a real credential so the two never drift, and the container's acceptance
+specs exercise the real token end-to-end. Both the contract-test and acceptance
+layers are defined in [[testing-rails-requests]]; the stub's interface is
+`current_authorization` and nothing else.
 
 
 ## Avoid

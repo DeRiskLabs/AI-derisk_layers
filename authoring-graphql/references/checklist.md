@@ -31,5 +31,5 @@
 - [ ] Acceptance spec following [[testing-graphql]] covers success + failure (and auth).
 - [ ] NO unit specs for concrete mutations, resolvers, or types.
 - [ ] Behaviour unit-tested in the user story spec ([[testing-user-stories]]).
-- [ ] Machinery (`Layers::Graphql::BaseEndpoint`, DSL mixins) tested in the layers gem
-      ([[testing-layers-base-classes]]).
+- [ ] Machinery (`Layers::Graphql::BaseEndpoint`, DSL mixins) tested in the layers gem's
+      own suite — not re-covered by an app spec.

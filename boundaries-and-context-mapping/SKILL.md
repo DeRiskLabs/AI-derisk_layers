@@ -21,7 +21,7 @@ anti_triggers:
   - choosing a layer object within a known context
   - building a component or engine whose boundary is already decided
 user_invocable: true
-last_reviewed_at: 2026-06-06
+last_reviewed_at: "2026-06-06"
 ---
 
 

@@ -20,7 +20,7 @@ anti_triggers:
   - work entirely inside one context
   - deciding where a boundary goes
 user_invocable: true
-last_reviewed_at: 2026-06-06
+last_reviewed_at: "2026-06-06"
 ---
 
 

@@ -34,6 +34,10 @@ expect(listener).to have_received(on_failure_callback).with(form: form)
 
 - Use the callback **let** (`on_success_callback`), not a literal symbol.
 - Always assert `.with(...)` — the keyword payload is part of the contract.
+- Asserting the message sent to the listener (rather than a return value) is the
+  **sanctioned layered-testing doctrine**, not coupling to fix: these fast units are valid
+  because the shared fakes are contract-tested and the container acceptance specs back the
+  real wiring.
 - When the payload object is **created by the subject** (no `let` to reference), inspect
   it with a verification block — and note rspec-mocks hands the keyword payload to the
   block as one **positional hash**, so take `|payload|` and `payload.fetch(:account)`,

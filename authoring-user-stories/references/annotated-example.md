@@ -2,7 +2,7 @@
 
 Neutral domain: `UserStories::Graph::Articles::Update` — update an article the current
 identity authored. An **engine-resident** story, so collaborators arrive through the
-engine's injected registries (doctrine ruling 15). The companion spec is the annotated
+engine's injected registries. The companion spec is the annotated
 example in [[testing-user-stories]].
 
 ```ruby

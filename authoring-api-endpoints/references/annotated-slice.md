@@ -76,7 +76,7 @@ module UserStories
         private
 
         def use_case
-          V1.configuration.use_cases[:orders_create]   # resolved, never named (ruling 15)
+          V1.configuration.use_cases[:orders_create]   # resolved, never named
         end
 
         def use_case_args

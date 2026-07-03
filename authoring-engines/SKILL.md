@@ -2,7 +2,7 @@
 name: authoring-engines
 title: Authoring Engines
 description: How to operationally create a mountable engine - feature engines under engines/, API engines under apis/ - covering generation, namespace stance, mounting, engine-local layer bases, and spec wiring. Use when adding a new engine or bringing one to house shape.
-category: architecture
+category: authoring
 status: active
 version: 2.1
 applies_to:
@@ -21,7 +21,7 @@ anti_triggers:
   - pure domain context (component)
   - a single endpoint in an existing engine
 user_invocable: true
-last_reviewed_at: 2026-06-10
+last_reviewed_at: "2026-06-10"
 ---
 
 
@@ -43,8 +43,7 @@ component ([[authoring-components]]).
 ## Required Reading
 
 ```text
-[[rails-app-architecture]]
-[[rails-app-architecture]] reference `references/engine-layout.md`
+[[rails-app-architecture]] — and its `references/engine-layout.md`
 ```
 
 Supporting references in this skill:
@@ -97,7 +96,7 @@ Feature engines mount at `/` and scope their own prefix inside their routes file
 (`mount V1::Engine, at: '/api', as: :api`).
 
 
-## Injected Registries (doctrine ruling 15)
+## Injected Registries
 
 Engines never touch ActiveRecord directly, and engine code makes **no static
 reference to constants the engine does not own** — no container models, no container
@@ -211,18 +210,31 @@ engines/invoicing/
   plus every `components/*/`, `engines/*/`, `apis/*/` slice, each run in its own
   directory with its own bundle.
 - Real crossings are validated at delivery level in the **container's** suite
-  (doctrine ruling 13) — the engine's isolated suite proves the engine against its
-  declared contracts; the container's acceptance specs prove the bindings.
+  — the engine's isolated suite proves the engine against its
+  declared contracts; the container's acceptance specs prove the bindings. The
+  acceptance-test layer (`spec/acceptance/`, no mocks, real DB, real registry bindings) is
+  defined canonically in [[testing-rails-requests]] — the engine relies on it as its
+  end-to-end backstop rather than proving persistence in its own schema-less suite.
 
-**Root spec vs configuration spec.** The root `invoicing_spec.rb` pins the engine's
-**public interface** — its boundary methods — and nothing about plumbing. The
-`Configuration`'s registry defaulting and delegation get their own
-`configuration_spec.rb`. Test only what the slice's `Configuration` adds — that each
-registry **defaults** to the engine's own registry class, and that `register_*`
-**delegates** to it — and **never re-test `Layers::BaseRegistry`** (registration,
-constantize-per-access): the `layers` gem owns those tests. This is [[ruby-testing]]'s
-"Complete, Fast, Ours" applied to a slice — test the wiring you own, double the gem
-you don't:
+**Engines ship their fakes; the container contract-tests them.** The engine's isolated specs
+lean on shared mocks/stubs (registry fakes, the auth credential stub keyed on
+`current_authorization` — [[api-authentication-authorization]]). Ship those shared fakes as
+part of the engine package and **expose them to the container's test suite**, so the engine
+and the container load the *same* double. The container then owns **contract tests** that run
+those engine-shipped fakes against the real collaborators and real schema; drift fails the
+container suite fast and hard. The full doctrine — engine-owned, container-exposed,
+container-contract-tested, two-layer drift defense — lives in [[testing-rails-requests]]. (How
+the engine exposes its fakes to the container — e.g. a `require '<engine>/testing'` support
+module in the gemspec — is an open implementation question; any generator support is out of
+scope here and raised as a separate finding.)
+
+**Root spec vs configuration spec.** The doctrine — root spec pins the public
+interface, `configuration_spec.rb` tests only the `Configuration`'s registry
+defaulting/delegation, never re-testing `Layers::BaseRegistry` — is canonical in
+[[authoring-components]]. It applies unchanged here; only the registries differ: an
+engine's `configuration_spec.rb` pins that each registry **defaults** to the engine's
+own registry class (`UseCaseRegistry`, the query-object registry) and that the
+`register_*` methods **delegate** to it:
 
 ```ruby
 RSpec.describe Invoicing::Configuration do

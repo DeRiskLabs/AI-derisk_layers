@@ -22,7 +22,7 @@ anti_triggers:
   - request spec
   - graphql acceptance spec
 user_invocable: true
-last_reviewed_at: 2026-06-08
+last_reviewed_at: "2026-06-08"
 ---
 
 
@@ -57,6 +57,13 @@ it calls back a `listener` with a success or failure method and keyword argument
 not return a value you assert on. **Assert on the messages sent to the listener and to
 collaborators**, not on return values.
 
+These are **fast, message-passing unit specs — no database.** A use case's job is to send
+the right messages (build its form, call `save!`/`update!`, notify the listener); proving a
+row actually persisted is retesting ActiveRecord and belongs to the container's acceptance
+layer, not here. Real persistence and real wiring are proven end-to-end by the container
+acceptance tests defined in [[testing-rails-requests]] — that layer is the backstop that
+makes these fast units safe.
+
 
 ## The Listener Setup
 
@@ -83,7 +90,7 @@ let(:valid_params) { valid_listener_args.merge(valid_use_case_args) }
 let(:params) { valid_params }                           # contexts re-point :params or a leaf let
 ```
 
-A use case takes **inputs** and builds its form peer internally (ruling 16), so the
+A use case takes **inputs** and builds its form peer internally, so the
 args are the inputs — not a `form:`. Double the form interface and stub the
 construction the use case performs:
 
@@ -124,6 +131,14 @@ Cover, at minimum, the outcomes the object can produce. Use `context 'when ...'`
 
 One expectation per `it`. Assert the listener received the right callback with the right
 keyword arguments, and that collaborators received the expected messages.
+
+These message-passing assertions (`have_received(on_success_callback)`,
+`have_received(:update!)`, and collaborator `have_received(:call)`) are the **sanctioned
+layered-testing doctrine**, not implementation coupling to refactor away. Fast
+message-passing unit specs are correct *because* the shared fakes they lean on are
+contract-tested and the container's acceptance specs prove the real bindings (both defined
+in [[testing-rails-requests]]) — the layered testing doctrine holds the two ends together.
+Write these assertions deliberately.
 
 ```ruby
 context 'when successful' do

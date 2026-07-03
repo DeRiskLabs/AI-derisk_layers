@@ -22,7 +22,7 @@ anti_triggers:
   - use case spec
   - request spec
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 

@@ -4,7 +4,7 @@ Neutral domain: `UserStories::Graph::Articles::Update` — find an article throu
 engine's registered query object (identity-scoped), send the update command to the
 registered use case, report via the listener. An **engine-resident** story, so its suite
 runs standalone against a schema-less dummy app: **registry fakes, no database, no
-factories** (doctrine ruling 15; see [[authoring-engines]]).
+factories** (engine code names no container constant; see [[authoring-engines]]).
 
 
 ## The Object Under Test

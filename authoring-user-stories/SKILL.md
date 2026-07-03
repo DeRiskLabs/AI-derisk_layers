@@ -2,7 +2,7 @@
 name: authoring-user-stories
 title: Authoring User Stories
 description: How to write a user story - a Layers::BaseLayer subclass that orchestrates one unit of user-facing behaviour (find, authorize, compose forms/use-cases/queries) and reports via success/failure. Use when adding or changing classes under a boundary's app/lib/user_stories.
-category: architecture
+category: authoring
 status: active
 version: 2.0
 applies_to:
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 
@@ -89,7 +89,7 @@ generator scaffolds; fill the generated TODOs.
    - `success(article: article)` / `failure(errors: article.errors)` — the success payload
      key **names the object it carries**; there is no such thing as a "result"
 4. A story in an **engine** resolves its use cases and query objects from the engine's
-   injected registries (doctrine ruling 15) — engine code never names container
+   injected registries — engine code never names container
    constants. A story in the **container app** may name `UseCases::*` / `Queries::*`
    directly: AR and its collaborators live there.
 
@@ -101,6 +101,8 @@ module UserStories
         required :current_authorization
         required :id
         optional :title
+
+        emits success: [:article], failure: [:errors]
 
         def call
           return failure(errors: ['Article not found']) unless article
@@ -150,13 +152,17 @@ end
 - Only delivery adapters (user interaction points) call user stories. Use cases, jobs, and
   other internal actors never do — a user story is the interaction boundary, not a shared
   internal helper.
-- Declarations are per-class: `required`/`optional`, `observer`, and `default_callbacks`
-  apply only to the declaring class — nothing inherits. State the complete contract in
-  the concrete class; keep base classes behavioural (includes, shared private helpers).
+- Declarations are per-class: `required`/`optional`, `emits`, `observer`, and
+  `default_callbacks` apply only to the declaring class — nothing inherits. State the complete
+  contract in the concrete class; keep base classes behavioural (includes, shared private
+  helpers).
 - Report through `success(...)` / `failure(...)` only. A failure payload always carries
   the means to render errors: an object responding to `.errors`, or an errors collection
   itself (e.g. `failure(errors: [...])`) — the endpoint renders without knowing what
   failed.
+- Declare the outputs with `emits success: [...], failure: [...]`; the keys must match those
+  payloads. The gem verifies the listener's callbacks and emitted keys against this
+  declaration at construction, so a mis-wired crossing fails at boot.
 - Authorization and "does it exist" live here, not in the use case — and authorization
   is identity scoping of the lookup (reach, not flags): off-limits records are
   not-found, never a "not authorized" oracle ([[api-authentication-authorization]]).

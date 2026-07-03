@@ -2,7 +2,7 @@
 name: authoring-layers-forms
 title: Authoring Layers Forms
 description: The layers overlay on form objects - forms inherit ApplicationForm over Layers::BaseForm, which carries the shared anatomy (form_error_messages + whitelist, model duck typing); each form writes only its accessors, validations, builders, and whitelist override. Use when writing forms in an app using the layers gem.
-category: architecture
+category: authoring
 status: active
 version: 1.0
 applies_to:
@@ -18,7 +18,7 @@ triggers:
 anti_triggers:
   - non-layers form objects
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 

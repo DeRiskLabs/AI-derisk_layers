@@ -19,7 +19,7 @@ triggers:
 anti_triggers:
   - pure framework config
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 
@@ -132,15 +132,7 @@ they live in the graph engine's `app/lib/user_stories/` — not in the main app.
 ## Scaffolding
 
 The layers gem generates every layer object in its ruled home, with TODO placeholders for
-the semantics. Never hand-create files a generator scaffolds:
-
-```text
-bin/rails generate layers:use_case <domain>/<action>
-bin/rails generate layers:user_story <domain>/<action>
-bin/rails generate layers:form <domain>/<action>
-bin/rails generate layers:query_object <name>
-bin/rails generate layers:graphql_mutation <domain>/<action>   # --engine <name>
-bin/rails generate layers:graphql_query <domain>               # --single for one record
-bin/rails generate layers:component <name>
-bin/rails generate layers:engine <name>                        # --family api for apis/
-```
+the semantics. Never hand-create files a generator scaffolds. The full `bin/rails generate
+layers:*` list — which command scaffolds which object, and the skill to pair with each — is
+the decision tree in [[rails-app-architecture]]; walk it once you know which abstraction you
+are writing.

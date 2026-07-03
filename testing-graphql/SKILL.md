@@ -23,7 +23,7 @@ anti_triggers:
   - use case spec
   - model spec
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 
@@ -36,14 +36,22 @@ the parsed response. These exercise the full stack: schema → mutation/resolver
 
 ## Scope: Acceptance Only
 
+These are **acceptance tests** — the GraphQL instance of the acceptance-test layer defined
+canonically in [[testing-rails-requests]]: they live in the container under
+`spec/acceptance/graph`, use no mocks, run against real registry bindings and a real DB, and
+send a JSON payload over HTTP to assert on the response document. They are the end-to-end
+backstop and sole proof of real persistence and wiring for GraphQL — see
+[[testing-rails-requests]] for the full doctrine (including the shared-fake/contract-test
+drift defense) rather than restating it here.
+
 This is the **only** spec layer for GraphQL. Mutations, resolvers, and types are pure
 declarations ([[authoring-graphql-mutations]], [[authoring-graphql-queries]]) — do NOT
 write unit specs for them. The division of labour:
 
 - **Acceptance specs (this skill)** — the declaration and its wiring, end to end.
 - **User story specs** ([[testing-user-stories]]) — the behaviour, unit-tested.
-- **The layers gem's own suite** ([[testing-layers-base-classes]]) — `Layers::Graphql::BaseEndpoint`
-  and the DSL mixins, tested exhaustively once.
+- **The layers gem's own suite** — `Layers::Graphql::BaseEndpoint` and the DSL mixins,
+  tested exhaustively once in the gem itself (a gem-maintainer concern).
 
 
 ## Required Reading

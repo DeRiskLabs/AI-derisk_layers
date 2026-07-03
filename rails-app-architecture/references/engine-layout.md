@@ -31,7 +31,7 @@ lib/                  generic libraries that could be extracted entirely (+ task
   info vault): their controllers/views/jobs/mailers and their own `app/lib/...` layer objects.
 - **Components (`components/*`)** are pure-domain bounded contexts packaged as unbuilt
   gems: no Rails abstractions, a root-constant public interface, persistence through a
-  boot-filled repository registry — see the authoring-components skill.
+  boot-filled repository registry — see the [[authoring-components]] skill.
 - The **main app** holds all models, plus shared domain not owned by a single engine:
   use cases, queries, forms, and any user stories the main app itself owns.
 - `apis/`, `engines/`, and `components/` are each consumed through Gemfile

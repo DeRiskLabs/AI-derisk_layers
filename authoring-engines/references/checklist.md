@@ -7,7 +7,8 @@
 
 ## Shell
 - [ ] Mountable engine (`isolate_namespace <Name>` in `engine.rb`).
-- [ ] Generated scaffolding pruned: no test directory, no dummy app.
+- [ ] Standalone spec home generated and kept: own `Gemfile`, `.rspec`,
+      `spec_helper`/`rails_helper`, and a schema-less `spec/dummy` app — do not prune them.
 - [ ] gemspec declares `rails` plus every Rails-facing dependency the engine owns.
 - [ ] `engine.rb` stance matches the family: session-middleware dedup (feature) or
       `api_only` + null session + JSON default (API).
@@ -30,14 +31,19 @@
 - [ ] Other contexts addressed only through their public interfaces.
 
 ## Verify
+- [ ] The engine owns a standalone suite: own `Gemfile`/bundle, `.rspec`,
+      `spec_helper`/`rails_helper`, and a schema-less `spec/dummy` app (no models, no
+      migrations, no database).
 - [ ] Specs live in the engine, mirroring its code (`engines/<name>/spec/use_cases/`,
-      `spec/requests/`, `spec/features/`); files `require 'rails_helper'` — the
-      container's resolves via the load path, no shim.
-- [ ] Scoped run green from the app root: `bundle exec rspec engines/<name>/spec`.
-- [ ] `bin/test_suite` runs `spec apis/*/spec engines/*/spec` (no slice paths in
-      `.rspec` patterns — they break scoped runs).
-- [ ] No per-engine dummy app; no engine-local bundle for specs.
-- [ ] Request/feature specs cover the mounted routes; layer specs follow their
-      testing skills.
+      `spec/requests/`, `spec/features/`), and boot the engine's own `rails_helper`
+      (which loads the dummy).
+- [ ] Scoped run green from the engine's own directory:
+      `cd engines/<name> && bundle exec rspec`.
+- [ ] `bin/test_suite` runs each slice in its own directory with its own bundle — the
+      container plus every `components/*`, `engines/*`, `apis/*`.
+- [ ] Engine specs fake the injected registries and stub auth; the real crossings are
+      proven by the container's acceptance specs (see the layered testing doctrine).
+- [ ] Request/feature specs cover the mounted routes against the dummy; layer specs
+      follow their testing skills.
 - [ ] No spec reaches into another context's internals — boundary changes are
       requested from the owning context and tested there.

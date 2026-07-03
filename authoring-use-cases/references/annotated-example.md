@@ -10,7 +10,7 @@ for a form peer to validate and construct. The companion spec is the annotated e
 module UseCases
   module Profiles
     class Update < ApplicationUseCase   # ApplicationUseCase < Layers::BaseLayer
-      # Inputs, not a pre-built form: nothing upstream builds one (ruling 16).
+      # Inputs, not a pre-built form: nothing upstream builds one.
       required :profile_id
       optional :first_name, :last_name, :phone
 
@@ -54,7 +54,7 @@ end
 
 - **Inputs, form peer built internally.** A user story (the caller from an engine)
   passes inputs and never builds a form; engine delivery code cannot name a container
-  form anyway (ruling 16). The use case reaches for its `Forms::` peer itself. Validation,
+  form anyway. The use case reaches for its `Forms::` peer itself. Validation,
   coercion, and construction live in the form ([[authoring-form-objects]]); the use case
   stays about the *write*. A use case that needs no validation skips the form entirely.
 - **`delegate :valid?`.** Declaring the one thing the use case asks of the form documents

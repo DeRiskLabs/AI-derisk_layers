@@ -1,43 +1,32 @@
-# Review Checklist — Layers Base Class / DSL Module Specs
+# Review Checklist — App Base Class Over a Layers Base
 
-Apply on top of the general checklist in derisk_ruby/testing-base-classes.
+Apply on top of the general checklist in derisk_ruby/testing-base-classes. This is for an
+app base class (`BaseUseCase`, `BaseUserStory`, `ApplicationQuery`, an app GraphQL endpoint
+base) over a Layers base — not the gem's own bases.
 
 
 ## Setup
 
-- [ ] `require 'layers_spec_helper'` (gem) or `rails_helper` (app), as appropriate.
-- [ ] Host constants stubbed where touched: `ActiveRecord::Relation`,
-      `GraphQL::ExecutionError` (or configured via `Layers.configure`), user story
-      classes via `stub_const`.
-- [ ] `Layers.configuration` reset after every example that touches it (ideally a
-      helper-level `config.after`).
+- [ ] `require 'rails_helper'` (the app spec runs in the app, not the gem).
 
 
-## Contract coverage
+## Pin only what the app adds
 
-- [ ] Composition pinned for every promised DSL module (`Observers`, `Inputs`,
-      `NullListener`, `CallbackDefaults`, `ClassCallable`).
-- [ ] Null listener default asserted (`be_a(Naught::BasicObject)`).
-- [ ] Callback defaults asserted (`on_success` equals `on_success_default`); custom
-      callbacks win when passed.
-- [ ] Custom listener identity asserted with `be`, not `eq`.
-- [ ] Inputs validation raises `Layers::DSL::MissingRequiredInputs` /
-      `Layers::DSL::UnexpectedInputs` (block-expectation form).
-- [ ] success/failure exercised through a concrete subclass `#call` — no `send` to
-      private reporting methods, no `expect(layer).to receive(:notify_observers)`.
-- [ ] Observer notification asserted behaviourally (callable observer recording into a
-      local).
+- [ ] Pins inheritance (`ancestors` includes `Layers::BaseLayer`).
+- [ ] Pins app additions only: callback-default overrides, extra includes, convenience
+      methods the base defines.
+- [ ] Does NOT re-test gem behaviour (inputs validation, null listener, callback-defaults
+      mechanics, observer notification) — the gem tests its own bases.
 
 
-## App base classes
+## Assert endowment behaviourally
 
-- [ ] Pins inheritance (`ancestors` includes `Layers::BaseLayer`) and app additions only
-      (callback default overrides, extra includes).
-- [ ] Does not re-test gem behaviour (inputs validation, null listener, observer
-      mechanics).
+- [ ] Where the base is meant to carry a capability, asserted behaviourally
+      (`respond_to`, missing-input `raise_error`) — never structurally via
+      `included_modules` (S-AI-027).
 
 
 ## GraphQL
 
-- [ ] App GraphQL tested acceptance-only (testing-graphql); only an app endpoint *base
+- [ ] App GraphQL tested acceptance-only ([[testing-graphql]]); only an app endpoint *base
       class* gets a spec here, pinning app additions only.

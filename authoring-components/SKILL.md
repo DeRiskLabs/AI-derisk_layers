@@ -2,7 +2,7 @@
 name: authoring-components
 title: Authoring Components
 description: How to create and structure a component - a bounded context packaged as an unbuilt gem under components/, with a root-constant public interface and a boot-filled repository registry. Use when creating a component, deciding between component, engine, and api, or wiring a component into the container application.
-category: architecture
+category: authoring
 status: active
 version: 1.3
 applies_to:
@@ -22,7 +22,7 @@ anti_triggers:
   - a single layer object inside the app
   - models or migrations
 user_invocable: true
-last_reviewed_at: 2026-06-10
+last_reviewed_at: "2026-06-10"
 ---
 
 

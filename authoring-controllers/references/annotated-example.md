@@ -2,7 +2,7 @@
 
 Two annotated controllers: a JSON:API resource controller (neutral domain:
 `V1::ProfilesController`) and an HTML controller (a sessions login flow). Both live in
-api/feature engines, so they obey ruling 15/16: a controller never names a container
+api/feature engines: a controller never names a container
 use case, query, form, or model — it delegates to its **engine sibling user story**
 (writes) or resolves a **query through the engine registry** (reads). Request specs for
 both flavours: [[testing-rails-requests]].
@@ -57,7 +57,7 @@ module V1
     private
 
     # The query is resolved through the engine registry and constructed with the
-    # credential — never `Queries::...` named directly (ruling 15).
+    # credential — never `Queries::...` named directly.
     def profiles_query
       V1.configuration.queries[:profiles].new(authorization: current_authorization)
     end
@@ -128,7 +128,7 @@ end
 - **Thin actions, nothing container-named.** Actions translate the request and call a
   layer object. Writes go to the engine sibling story (engine-owned, safe to name);
   reads resolve a query through the engine registry. No use case, form, query, or model
-  constant is named in the engine (ruling 15/16) — the lookup and the form both live
+  constant is named in the engine — the lookup and the form both live
   past the boundary.
 - **Controller as listener.** `listener: self` + `on_success:`/`on_failure:` means the
   layer object stays caller-agnostic, and the controller renders in named callbacks. The

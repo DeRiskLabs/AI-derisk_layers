@@ -2,7 +2,7 @@
 name: authoring-graphql-queries
 title: Authoring GraphQL Queries
 description: How to write a declarative GraphQL query resolver - an ApplicationResolver subclass that declares arguments, a return type, and the user story to run via the layers gem's user_story DSL. Use when adding or changing files under apis/graph/app/graphql/graph/resolvers.
-category: architecture
+category: authoring
 status: active
 version: 1.3
 applies_to:
@@ -21,7 +21,7 @@ anti_triggers:
   - rest controller
   - use case internals
 user_invocable: true
-last_reviewed_at: 2026-06-07
+last_reviewed_at: "2026-06-07"
 ---
 
 

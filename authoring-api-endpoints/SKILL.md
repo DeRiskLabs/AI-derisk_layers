@@ -2,7 +2,7 @@
 name: authoring-api-endpoints
 title: Authoring API Endpoints
 description: How to add one REST/JSON:API command endpoint (create/update/destroy) as a vertical slice - the layers:api_endpoint scaffold generates the container use case + form and the engine story, controller, serializer, route, registration, and specs; you fill the semantics. Use when adding a REST write endpoint to an api engine.
-category: architecture
+category: authoring
 status: active
 version: 1.0
 applies_to:
@@ -21,7 +21,7 @@ anti_triggers:
   - a read/index/show endpoint
   - business logic internals
 user_invocable: true
-last_reviewed_at: 2026-06-08
+last_reviewed_at: "2026-06-08"
 ---
 
 
@@ -60,8 +60,10 @@ resolved through the engine registry, rendered by a serializer, no command path.
 
 ## What the slice is
 
-The crossing obeys ruling 15/16 — the engine names no container constant; everything
-container-side is reached through the registry:
+This is the house write path (controller → user story → use case → form; canonical in
+[[rails-app-architecture]]) split across the engine/container boundary. The endpoint-specific
+rule: the engine names no container constant; everything container-side is reached through the
+registry.
 
 ```text
 controller (engine)              thin; forwards permitted raw params + current_authorization
@@ -100,7 +102,7 @@ action; the engine initializer (container) binds the use case into the registry.
   controller is created once, then the action is injected.
 - The engine half names no container use case, query, form, or model — story resolves
   the use case via the registry; the use case (container) owns the form
-  ([[authoring-use-cases]], ruling 16).
+  ([[authoring-use-cases]] — the use case builds its own form peer).
 - Authorization is the credential's scope, applied in the story's lookups — not a flag
   check in the controller ([[api-authentication-authorization]]).
 - The serializer needs `jsonapi-serializer`; the controller's `render_json_api` /
@@ -110,5 +112,5 @@ action; the engine initializer (container) binds the use case into the registry.
 ## Avoid
 
 - hand-creating any slice file — generate, then fill.
-- a controller that builds a form or names a use case (ruling 15/16).
+- a controller that builds a form or names a use case.
 - routing a read through this scaffold — reads are query objects + serializers.

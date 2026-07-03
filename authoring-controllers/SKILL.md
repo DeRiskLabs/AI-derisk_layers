@@ -2,7 +2,7 @@
 name: authoring-controllers
 title: Authoring Controllers
 description: How to write thin controllers that delegate work to use cases or user stories as listener and render the outcome - JSON:API controllers via serializers, HTML controllers via flash/redirect. Use when adding or changing controllers in the app or an engine.
-category: architecture
+category: authoring
 status: active
 version: 1.2
 applies_to:
@@ -22,7 +22,7 @@ anti_triggers:
   - use case internals
   - model logic
 user_invocable: true
-last_reviewed_at: 2026-06-08
+last_reviewed_at: "2026-06-08"
 ---
 
 
@@ -63,11 +63,12 @@ engine (`engines/<engine>/app/controllers/...`) under that engine's base control
 
 ## Anatomy of a mutating action (JSON:API)
 
-A REST controller lives in an api engine, so it obeys ruling 15/16: it never names a
-container use case or builds a container form. It delegates to its **engine sibling
-user story** (engine-owned — naming it is fine), which is the fast exit to the
-container use case via the registry; the use case builds its own form peer. Generate
-the whole slice with `bin/rails generate layers:api_endpoint <resource>/<action>`.
+A REST controller sits at the top of the house write path (controller → user story →
+use case → form; canonical in [[rails-app-architecture]]). Living in an api engine, it
+never names a container use case or builds a container form: it delegates to its
+**engine sibling user story** (engine-owned — naming it is fine), the fast exit to the
+container use case via the registry. Generate the whole slice with
+`bin/rails generate layers:api_endpoint <resource>/<action>` ([[authoring-api-endpoints]]).
 
 1. `before_action` guards validate request shape / existence (return rendered errors).
 2. Call the engine's user story as a class method, controller as listener, forwarding

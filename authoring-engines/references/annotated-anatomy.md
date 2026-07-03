@@ -254,7 +254,7 @@ end
 
 No session, no cookies, no forgery protection, JSON by default. The GraphQL engine
 shares the `api_only` stance; its schema and type wiring live in the
-authoring-graphql skill's engine-anatomy reference.
+[[authoring-graphql]] skill's engine-anatomy reference.
 
 
 ## config/routes.rb — engine side
