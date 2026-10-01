@@ -4,7 +4,7 @@ title: Authoring Components
 description: How to create and structure a component - a bounded context packaged as an unbuilt gem under components/, with a root-constant public interface and a boot-filled repository registry. Use when creating a component, deciding between component, engine, and api, or wiring a component into the container application.
 category: authoring
 status: active
-version: 1.3
+version: 1.5
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - a single layer object inside the app
   - models or migrations
 user_invocable: true
-last_reviewed_at: "2026-06-10"
+last_reviewed_at: "2026-10-01"
 ---
 
 
@@ -99,26 +99,32 @@ generates the component skeleton (every file annotated in
 ```text
 components/billing/
 ├── billing.gemspec              # unbuilt gem; depends on layers
-├── Gemfile                      # own bundle for the isolated suite
+├── Gemfile                      # private layers source + isolated test bundle
+├── .rspec                       # loads the component-named spec helper
 ├── .rubocop.yml                 # inherits the application's config
 ├── README.md                    # the component's contract, stated at its door
 ├── lib/
-│   ├── billing.rb               # root constant: requires, configure/configuration
+│   ├── billing.rb               # component-owned loader + public root constant
 │   └── billing/
 │       ├── version.rb
-│       ├── configuration.rb     # carries repo + registration delegators
+│       ├── configuration.rb     # root config methods + configuration object
 │       └── repository_registry.rb
 └── spec/
-    ├── spec_helper.rb           # requires the component only — no Rails
-    └── billing_spec.rb
+    ├── billing_spec_helper.rb   # requires the component only — no Rails
+    ├── billing_spec.rb          # pins the root-constant public interface
+    └── billing/
+        └── configuration_spec.rb
 ```
 
-It also creates `bin/test_components` (with the first component). Add the gem to the
-Gemfile's `path 'components'` block; `components/` sits outside the autoload paths, so
-no autoloader configuration is involved.
+It creates the aggregate `bin/test_suite` when that runner is absent. Add the gem to the
+Gemfile's `path 'components'` block. `components/` stays outside the Rails autoload and
+eager-load paths; each component owns a Zeitwerk loader for its conventional `lib/` tree.
+Do not add component paths to the container's Rails loaders.
 
-There is no autoloading inside the component either: every new file is required
-explicitly from `lib/billing.rb` (or from a file it requires).
+The root file explicitly requires `configuration.rb` after defining the root module,
+because that boundary publishes the root-level `configure` and `configuration` methods.
+Zeitwerk loads conventional internal constants such as `RepositoryRegistry`, `VERSION`,
+and future layer objects when referenced.
 
 
 ## The Public Interface
@@ -160,6 +166,16 @@ grows:
 
 ```ruby
 module Billing
+  class << self
+    def configuration
+      @configuration ||= Configuration.new
+    end
+
+    def configure
+      yield(configuration)
+    end
+  end
+
   class Configuration
     attr_writer :repo
 
@@ -178,8 +194,9 @@ end
 - `attr_accessor` only for genuinely nil-default flags.
 - Logic that picks a default by inspecting the environment lives in a private
   `detect_*` method called from the reader.
-- The root constant carries the access pair: a memoized `configuration` and a
-  `configure` that yields it.
+- `lib/<name>/configuration.rb` carries the root constant's access pair: a memoized
+  `configuration` and a `configure` that yields it. Keep these methods with the
+  configuration object rather than defining them in `lib/<name>.rb`.
 
 
 ## Persistence: The Repository Registry
@@ -223,8 +240,11 @@ Rules:
 These rules bind components — engines and apis depend on Rails by definition and
 follow [[authoring-engines]]:
 
-- The gemspec depends on `layers` (plus any pure-Ruby gems the domain needs) — never
-  on `rails`.
+- The gemspec depends on `layers` and `zeitwerk` (plus any pure-Ruby gems the domain
+  needs) — never on `rails`.
+- The isolated Gemfile pins Active Model and Active Support exactly to the generating
+  container application's Rails version. This prevents the standalone suite from
+  exercising a different framework line from the host application.
 - Never name container or engine constants in component code — host classes arrive
   through the registry only.
 - One component talks to another only through the other's root-constant public
@@ -239,14 +259,15 @@ follow [[authoring-engines]]:
 
 ## Testing
 
-Each component carries its own isolated suite: its own Gemfile and a spec_helper that
-requires just the component — no Rails, no container app.
+Each component carries its own isolated suite: its own Gemfile with the private
+`layers` source, RSpec, and `always_execute`, plus a component-named spec helper
+(`<name>_spec_helper.rb`) that requires `always_execute` and just the component — no
+Rails, no container app.
 
-- All components from the app root: `bin/test_components` (each suite under its own
-  bundle).
+- The complete container and slice suite: `bin/test_suite`.
 - One component: `BUNDLE_GEMFILE=Gemfile bundle exec rspec` from the component
-  directory. While `layers` is unreleased, wire its private source into the
-  component's Gemfile first.
+  directory. The generator wires the unreleased private `layers` source into the
+  component Gemfile.
 - Swap the whole registry rather than registering doubles — the component only ever
   sends `[]`, so anything answering it serves:
 
@@ -258,9 +279,9 @@ Use cases inside the component are tested with [[testing-use-cases]]; the suite 
 without a database, so the swapped-in fakes stand in for repositories.
 
 **Root spec vs configuration spec.** The root `billing_spec.rb` pins the component's
-**public interface** — the root-constant methods — and nothing about plumbing. The
-`Configuration`'s registry defaulting and delegation get their own
-`configuration_spec.rb`. Test only what the `Configuration` adds — that `#repo`
+**public interface** and its boot contract: root-constant methods and representative
+internal constant autoloading. The `Configuration`'s registry defaulting and delegation
+get their own `configuration_spec.rb`. Test only what the `Configuration` adds — that `#repo`
 **defaults** to the component's `RepositoryRegistry`, and that `register_repository(s)`
 **delegates** to it — and **never re-test `Layers::BaseRegistry`** (registration,
 constantize-per-access): the `layers` gem owns those tests. This is [[ruby-testing]]'s
@@ -328,4 +349,4 @@ end
 - Reaching into another component's internals (`Other::UseCases::...`) instead of its
   public interface.
 - Adding `components/` to autoload or eager-load paths — components are Gemfile-path
-  consumed, explicitly required.
+  consumed and own their Zeitwerk loaders.

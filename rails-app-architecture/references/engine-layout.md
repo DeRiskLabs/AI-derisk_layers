@@ -35,7 +35,8 @@ lib/                  generic libraries that could be extracted entirely (+ task
 - The **main app** holds all models, plus shared domain not owned by a single engine:
   use cases, queries, forms, and any user stories the main app itself owns.
 - `apis/`, `engines/`, and `components/` are each consumed through Gemfile
-  `path '<location>' do ... end` blocks; nothing in them is autoloaded by the container.
+  `path '<location>' do ... end` blocks. Components own their Zeitwerk loaders and are
+  not added to the container's Rails autoload or eager-load paths.
 
 
 ## Base classes per boundary

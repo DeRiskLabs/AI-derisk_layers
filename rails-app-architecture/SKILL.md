@@ -4,7 +4,7 @@ title: Rails App Architecture (House Style)
 description: The top-level guide to how Ruby/Rails apps are built in this house style - a modular monolith of a main app plus API engines, feature engines, and pure-domain components, with business logic in layer objects (the layers gem). Load first when building or extending a Rails app here; it indexes the specific authoring and testing skills.
 category: architecture
 status: active
-version: 2.2
+version: 2.3
 applies_to:
   - Ruby
   - Rails
@@ -21,7 +21,7 @@ triggers:
 anti_triggers:
   - non-Ruby work
 user_invocable: true
-last_reviewed_at: "2026-06-08"
+last_reviewed_at: "2026-10-01"
 ---
 
 
@@ -45,7 +45,8 @@ writing.
    it needs Rails abstractions it is an engine (under `apis/` when it is a collection of
    API endpoints); pure domain logic is a component. The main app owns all ActiveRecord
    models either way; `lib/` is reserved for generic libraries that could be extracted
-   entirely.
+   entirely. Components own their Zeitwerk loaders and are never added to the container's
+   Rails autoload or eager-load paths.
 2. **Thin framework edges, fat domain objects.** Controllers and GraphQL endpoints only
    translate and render. Behaviour lives in layer objects (use cases, user stories, forms,
    query objects) built on `Layers::BaseLayer` — see [[layered-architecture-placement]].
@@ -104,6 +105,10 @@ The full skill inventory lives in each collection's `INDEX.md`
 Generators own structure; you fill in semantics. **Never hand-create a file a generator
 scaffolds.** Walk the tree to the generator command, then read the paired skill to fill
 the TODOs.
+
+The generator commands are supplied by the development-only `layers-scaffold` gem.
+Generated application code depends on the `layers` runtime gem; it must not load or
+depend on `layers-scaffold` at runtime.
 
 ```text
 What are you building?
