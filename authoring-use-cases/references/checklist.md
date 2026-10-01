@@ -19,6 +19,9 @@
 - [ ] No reads that belong in a query object.
 - [ ] No orchestration of other use cases (that is a user story).
 - [ ] Keyword payloads are stable and meaningful.
+- [ ] A neighbouring component command is represented by a private role-named callable
+      dependency that resolves only its public root method.
+- [ ] A registry is introduced only when repeated crossings justify its boot-time shape.
 
 ## Verify
 - [ ] A spec exists following [[testing-use-cases]] covering success, validation failure, and

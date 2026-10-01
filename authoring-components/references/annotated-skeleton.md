@@ -177,6 +177,7 @@ RSpec loads the helper named for this component rather than an ambiguous global
 ```ruby
 # frozen_string_literal: true
 
+require 'bundler/setup'
 require 'always_execute'
 require 'billing'
 
@@ -187,8 +188,10 @@ RSpec.configure do |config|
 end
 ```
 
-Requires the testing DSL and the component only. No Rails, no database, no container
-app — if a spec needs one of those, the code under test is in the wrong place.
+Activates the component's own bundle before requiring the testing DSL and component.
+This makes direct `rspec` execution from the component directory resolve private/path
+dependencies correctly. No Rails, no database, no container app — if a spec needs one
+of those, the code under test is in the wrong place.
 
 
 ## spec/billing_spec.rb

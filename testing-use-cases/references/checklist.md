@@ -30,5 +30,8 @@ Binary checks for a use-case or user-story spec before merge.
 
 ## Doubles
 - [ ] Collaborators doubled with `instance_spy`/`instance_double`/`class_double`.
-- [ ] The object under test is never stubbed.
+- [ ] The object under test's behaviour is never stubbed. The only exception is a private
+      method that solely resolves an external callable dependency.
+- [ ] Opaque values from another component use blind doubles; its internal model constants
+      do not appear in the consumer spec.
 - [ ] Doubles expose only the methods actually called.

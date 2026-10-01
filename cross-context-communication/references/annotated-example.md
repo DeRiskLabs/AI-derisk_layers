@@ -101,7 +101,7 @@ module UserStories
       required :form
 
       def call
-        Accounts.register_identity(form: form, listener: self)
+        account_registrar.call(form: form, listener: self)
       end
 
       def success(identity:)
@@ -115,6 +115,10 @@ module UserStories
 
       private
 
+      def account_registrar
+        @account_registrar ||= Accounts.public_method(:register_identity)
+      end
+
       def build_customer(identity)
         Customer.new(identity_uuid: identity.uuid)
       end
@@ -123,8 +127,10 @@ module UserStories
 end
 ```
 
-- The caller sends the public message with itself as listener and implements exactly
-  the callbacks the `emits` declaration names.
+- The caller sends the public message through a role-named callable with itself as
+  listener and implements exactly the callbacks the `emits` declaration names.
+- The private resolver is today's composition point; a boot-filled registry can replace
+  the `public_method` lookup later without changing the operation.
 - The identity crosses onward as a uuid — never as a constant from inside `Accounts`.
 - Reading data is the simpler contract — no listener:
 
@@ -142,19 +148,23 @@ RSpec.describe UserStories::Invoicing::OnboardCustomer do
   let(:form) { instance_double(Forms::Invoicing::Onboarding, valid?: true) }
   let(:listener) { double('listener', success: nil, failure: nil) }
 
-  before { allow(Accounts).to receive(:register_identity) }
+  let(:account_registrar) { spy(:account_registrar) }
+
+  before do
+    allow(story).to receive(:account_registrar).and_return(account_registrar)
+  end
 
   execute { story.call }
 
   it 'sends the command across the boundary' do
-    expect(Accounts).to have_received(:register_identity)
+    expect(account_registrar).to have_received(:call)
       .with(form: form, listener: story)
   end
 end
 ```
 
-The neighbour's internals never appear: the spec stubs the public interface
-(anything answering the message serves) and asserts the outgoing command was sent —
-the assertion-target grid's rule for outgoing commands. The callee's behaviour is
-tested on its own side, in its own spec directory; the whole crossing is validated
-by the interaction owner's delivery-level specs.
+The neighbour's constant and internals never appear in the consumer unit spec: the spec
+substitutes the private callable dependency resolver and asserts the outgoing command was
+sent. This is the narrow composition-seam exception to the usual rule against stubbing the
+object under test. The callee's behaviour is tested on its own side, in its own spec
+directory; the whole crossing is validated by the interaction owner's delivery-level specs.

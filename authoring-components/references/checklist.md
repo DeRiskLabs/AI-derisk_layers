@@ -18,7 +18,8 @@
 - [ ] The gemspec declares `layers` and `zeitwerk`; the isolated Gemfile pins Active Model
       and Active Support exactly to the container Rails version.
 - [ ] The isolated Gemfile resolves the private `layers` source and includes
-      `always_execute`; `<name>_spec_helper` requires it before component specs.
+      `always_execute`; `<name>_spec_helper` requires `bundler/setup` before
+      `always_execute` and the component.
 - [ ] The root spec pins every published root-constant entry point, and the configuration
       spec proves the default registry and registration delegators.
 - [ ] `bin/test_suite` runs the container plus every component, engine, and API bundle.
@@ -53,7 +54,8 @@
 - [ ] No user stories inside the component; no use case calls one.
 
 ## Verify
-- [ ] Isolated suite green: `BUNDLE_GEMFILE=Gemfile bundle exec rspec` in the component.
+- [ ] Isolated suite green with direct `rspec` in the component; aggregate execution may
+      use `BUNDLE_GEMFILE=Gemfile bundle exec rspec` explicitly.
 - [ ] Aggregate suite green: `bin/test_suite` from the app root.
 - [ ] Specs swap the whole registry (`configuration.repo = { ... }`) instead of
       registering doubles.

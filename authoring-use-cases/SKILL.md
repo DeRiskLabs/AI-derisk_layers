@@ -4,7 +4,7 @@ title: Authoring Use Cases
 description: How to write a use-case object - a Layers::BaseLayer subclass that performs one transactional unit of work and reports via success/failure. Use when adding or changing classes under app/lib/use_cases.
 category: authoring
 status: active
-version: 1.6
+version: 1.7
 applies_to:
   - Ruby
   - Rails
@@ -20,7 +20,7 @@ anti_triggers:
   - query object
   - form object
 user_invocable: true
-last_reviewed_at: "2026-06-08"
+last_reviewed_at: "2026-10-01"
 ---
 
 
@@ -142,6 +142,11 @@ sit at the same level and collaborate freely) — see [[authoring-layers-forms]]
 - Never call a user story from a use case. A user story is the boundary of a user
   interaction; a use case sits below it — user interaction boundary → business logic, never
   the reverse.
+- A component use case may send a public command to a neighbouring component when that
+  crossing is part of completing its one operation. Resolve the root public method as a
+  callable behind a private role-named dependency method; do not scatter the neighbour
+  constant through the operation or call its internals. Introduce a boot-filled registry
+  only after repeated crossings establish the registration shape.
 
 
 ## Avoid

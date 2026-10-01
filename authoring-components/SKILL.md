@@ -4,7 +4,7 @@ title: Authoring Components
 description: How to create and structure a component - a bounded context packaged as an unbuilt gem under components/, with a root-constant public interface and a boot-filled repository registry. Use when creating a component, deciding between component, engine, and api, or wiring a component into the container application.
 category: authoring
 status: active
-version: 1.5
+version: 1.6
 applies_to:
   - Ruby
   - Rails
@@ -87,6 +87,28 @@ home for bounded slices: it is reserved for generic libraries that could conceiv
 be extracted from the application entirely.
 
 
+## Ownership Before Creation
+
+Before generating a component or adding domain constants to an existing one, write the
+smallest useful ownership map:
+
+```text
+operation / value         owning component       caller
+package loading           Definition             container
+Object Type / Property    Ontology               Definition
+```
+
+Then compare it with the Story's non-goals. Do not create a local substitute for a value
+owned by a neighbouring component, and do not implement a future component merely
+because the current fixture contains its data. Design and test the neighbour's root
+protocol before moving owned behaviour across the boundary.
+
+Repeated domain prefixes in one component (`ObjectTypeBuilder`, `ObjectTypeValidator`,
+`ObjectTypeRepository`) are a prompt to check ownership. They may indicate a useful
+internal namespace, but they may instead reveal a missing bounded context. Decide which
+before reorganizing files.
+
+
 ## Creating One
 
 ```bash
@@ -110,7 +132,7 @@ components/billing/
 │       ├── configuration.rb     # root config methods + configuration object
 │       └── repository_registry.rb
 └── spec/
-    ├── billing_spec_helper.rb   # requires the component only — no Rails
+    ├── billing_spec_helper.rb   # activates its bundle, then requires the component
     ├── billing_spec.rb          # pins the root-constant public interface
     └── billing/
         └── configuration_spec.rb
@@ -141,10 +163,12 @@ end
 ```
 
 - The interface splits into **commands and queries** (see
-  [[cross-context-communication]]). Commands change state: the root-constant methods
-  are the public protocol, use cases do the work behind them, and outcomes travel back
-  through the listener (`success`/`failure` callbacks) — a command's return value is
-  never used. Queries are side-effect-free asks returning the answer itself: an
+  [[cross-context-communication]]). Commands are fallible operations with named
+  outcomes—usually state changes, plus the narrow fallible in-memory case described by
+  that skill. Root-constant methods are the public protocol, use cases do the work
+  behind them, and outcomes travel back through listener (`success`/`failure`) callbacks;
+  a command's return value is never used. Queries are side-effect-free asks with no
+  domain-failure outcome, returning the answer itself: an
   enumerable (possibly empty, never nil) for collection questions, the object or nil
   for singular ones.
 - Callers — the container, engines, other components — send only these messages.
@@ -261,13 +285,15 @@ follow [[authoring-engines]]:
 
 Each component carries its own isolated suite: its own Gemfile with the private
 `layers` source, RSpec, and `always_execute`, plus a component-named spec helper
-(`<name>_spec_helper.rb`) that requires `always_execute` and just the component — no
-Rails, no container app.
+(`<name>_spec_helper.rb`) that requires `bundler/setup` before `always_execute` and the
+component. This keeps direct `rspec` execution inside the component on its isolated
+bundle without loading Rails or the container app.
 
 - The complete container and slice suite: `bin/test_suite`.
-- One component: `BUNDLE_GEMFILE=Gemfile bundle exec rspec` from the component
-  directory. The generator wires the unreleased private `layers` source into the
-  component Gemfile.
+- One component: `rspec` from the component directory. `bundler/setup` activates the
+  local Gemfile; `BUNDLE_GEMFILE=Gemfile bundle exec rspec` remains the explicit form
+  used by aggregate runners. The generator wires the unreleased private `layers` source
+  into the component Gemfile.
 - Swap the whole registry rather than registering doubles — the component only ever
   sends `[]`, so anything answering it serves:
 

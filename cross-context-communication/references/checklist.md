@@ -6,7 +6,10 @@
 - [ ] Nothing in between: no query touches state; no command's return value is used.
 
 ## Command — caller
-- [ ] Message sent to the root-constant interface, listener (or delegate) attached.
+- [ ] Message sent through a role-named callable dependency that resolves to the
+      root-constant public method, listener (or delegate) attached.
+- [ ] The callable is resolved behind a private method so a future boot-filled registry
+      does not change the operation.
 - [ ] Callbacks implemented exactly per the contract's payload keys.
 - [ ] Failure handling extracts errors from the failure payload (`.errors` object or
       errors collection).
@@ -33,7 +36,8 @@
       command — deferral does not change the protocol.
 
 ## Verify
-- [ ] Caller specs stub the neighbour's public interface and assert the outgoing
-      message.
+- [ ] Caller specs substitute the private callable seam and assert its outgoing `#call`.
+- [ ] Caller specs use blind doubles for opaque callback values and do not name the
+      neighbour's internal model classes.
 - [ ] Callee boundary specs live on the owning side, in its spec directory.
 - [ ] The crossing is covered by the interaction owner's delivery-level specs.

@@ -62,6 +62,23 @@ it 'creates an owner' do
 end
 ```
 
+## Substituting a cross-component command
+
+Resolve a neighbouring component's public command behind a private callable dependency.
+The consumer unit spec substitutes that resolver and asserts the outgoing `#call`:
+
+```ruby
+let(:registrar) { spy(:registrar) }
+
+before do
+  allow(use_case).to receive(:account_registrar).and_return(registrar)
+end
+```
+
+This is a narrow composition-seam exception to the rule below. The substituted method must
+only resolve the callable; it must not contain business decisions or orchestration. Use a
+blind double for an opaque callback value that the consumer only passes through.
+
 ## Asserting something did NOT happen
 
 ```ruby
@@ -84,5 +101,6 @@ end
   RSpec or `always_execute`). To inspect failure payloads either:
   - assert `have_received(on_failure_callback).with(errors: expected)`, or
   - (integration style) read the record the object mutated: `account.errors.full_messages`.
-- stubbing the object under test (`allow(use_case).to receive(...)`).
+- stubbing behaviour on the object under test. A private method that only resolves an
+  external callable dependency is the sole exception.
 - putting `allow(...)` inside an `it`.

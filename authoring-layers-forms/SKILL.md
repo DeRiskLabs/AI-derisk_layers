@@ -4,7 +4,7 @@ title: Authoring Layers Forms
 description: The layers overlay on form objects - forms inherit ApplicationForm over Layers::BaseForm, which carries the shared anatomy (form_error_messages + whitelist, model duck typing); each form writes only its accessors, validations, builders, and whitelist override. Use when writing forms in an app using the layers gem.
 category: authoring
 status: active
-version: 1.0
+version: 1.1
 applies_to:
   - Ruby
   - Rails
@@ -18,7 +18,7 @@ triggers:
 anti_triggers:
   - non-layers form objects
 user_invocable: true
-last_reviewed_at: "2026-06-07"
+last_reviewed_at: "2026-10-01"
 ---
 
 
@@ -45,6 +45,10 @@ Apps define one thin base; every form inherits it:
 class ApplicationForm < Layers::BaseForm
 end
 ```
+
+Components and other bounded contexts use the same pattern under their own namespace,
+for example `Definition::Forms::BaseForm < Layers::BaseForm`. The local base is the
+context seam; it does not make document models or domain values into forms.
 
 `Layers::BaseForm` carries:
 
@@ -99,5 +103,7 @@ base is exhaustively specced in the gem.
 - re-implementing `form_error_messages`, `new_record?`, or `persisted?` in a form —
   that is the base's job.
 - `include ActiveModel::Model` in a form — inherited.
+- inheriting the form base from a document model or domain value merely to borrow
+  validation behavior — include only the Active Model behavior that object actually owns.
 - forgetting the `report_full_errors_for` override — the safe default surfaces
   nothing, so users see no errors.

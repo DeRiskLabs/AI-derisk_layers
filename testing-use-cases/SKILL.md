@@ -4,7 +4,7 @@ title: Testing Use Cases
 description: Spec pattern for testing Layers::BaseLayer use cases (UseCases::*) that communicate by message passing to a listener. User stories share these mechanics - see testing-user-stories. Use when writing or modifying specs for classes under app/lib/use_cases.
 category: testing
 status: active
-version: 1.3
+version: 1.4
 applies_to:
   - Ruby
   - Rails
@@ -22,7 +22,7 @@ anti_triggers:
   - request spec
   - graphql acceptance spec
 user_invocable: true
-last_reviewed_at: "2026-06-08"
+last_reviewed_at: "2026-10-01"
 ---
 
 
@@ -191,6 +191,32 @@ end
 ```
 
 
+## Cross-Component Callable Seams
+
+When a use case sends a command to another component, substitute the private dependency
+resolver rather than spying on the neighbouring root constant:
+
+```ruby
+let(:assembler) { spy(:assembler) }
+
+before do
+  allow(use_case).to receive(:ontology_assembler).and_return(assembler)
+end
+
+it 'assembles the ontology' do
+  expect(assembler).to have_received(:call).with(definitions: definitions, listener: use_case)
+end
+```
+
+This is the narrow exception to the rule against stubbing the object under test: the method
+must only resolve an external callable dependency. Never stub the use case's decisions,
+validation, callbacks, or orchestration.
+
+If a callback payload is opaque to the consuming component, use a blind double such as
+`double(:ontology)`. Do not introduce an `instance_double` of the neighbouring component's
+internal model merely to pass the value through.
+
+
 ## Negative and Before/After Assertions
 
 To assert something did **not** happen, assert the spy did not receive the message:
@@ -216,7 +242,8 @@ end
 - `listener.on_failure.first_args[:errors]` — `first_args` is not a real API. Assert
   with `have_received(on_failure_callback).with(errors: ...)` instead.
 - multiple expectations in one `it`; setup, stubbing, or the `#call` action inside an `it`.
-- stubbing the object under test.
+- stubbing behaviour on the object under test; only a private external-dependency resolver
+  may be substituted as described above.
 
 
 ## Preferred Structure
