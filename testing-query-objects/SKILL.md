@@ -1,10 +1,10 @@
 ---
 name: testing-query-objects
 title: Testing Query Objects
-description: Spec pattern for query objects (Queries::*) - DB-backed specs that pin the scoping boundary, the empty case, each composed condition, and the chainable interface. Use when writing or modifying specs under spec/lib/queries.
+description: Spec patterns for query objects (Queries::*) - DB-backed boundary specs for relation queries and fast identity/nil specs for singular object queries. Use when writing or modifying specs under spec/lib/queries.
 category: testing
 status: active
-version: 1.1
+version: 1.2
 applies_to:
   - Ruby
   - Rails
@@ -22,15 +22,15 @@ anti_triggers:
   - use case spec
   - request spec
 user_invocable: true
-last_reviewed_at: "2026-06-07"
+last_reviewed_at: "2026-10-01"
 ---
 
 
 # Testing Query Objects
 
-Query objects (`Queries::*`) are the reads extracted from models — real logic objects, so
-they get real specs. **Test at the boundary**: the spec builds records on both sides of the
-scope and asserts what the query returns, never how the relation is assembled.
+Query objects (`Queries::*`) are application reads, so they get real specs through their
+public query message. Relation queries are tested at the data boundary. Singular
+object-or-`nil` queries are tested as fast units against an injected state holder.
 
 The reference suite has no query specs — that is drift. Every query object gets one.
 
@@ -52,7 +52,7 @@ references/checklist.md           # pre-merge review checklist
 Authoring the objects under test: [[authoring-query-objects]].
 
 
-## Shape
+## Relation Query Shape
 
 - `require 'rails_helper'`; DB-backed (`FactoryBot.create`) — a query's behaviour *is* its
   SQL, so this is a necessary slow test.
@@ -82,7 +82,39 @@ end
 ```
 
 
-## What to Cover
+## Singular Object Query Shape
+
+A singular query does not need a database, relation double, or `ApplicationQuery`
+inheritance. Inject the state holder, execute the query, and assert the returned object by
+identity. Cover the absent case when `nil` is part of the public contract.
+
+```ruby
+RSpec.describe Queries::CurrentReleaseQuery do
+  subject(:query) { described_class.new(current_release: current_release) }
+
+  let(:current_release) do
+    instance_double('CurrentRelease', release: release)
+  end
+  let(:release) { double(:release) }
+
+
+  describe '#call' do
+    execute(:current) do
+      query.call
+    end
+
+    it 'returns the retained release' do
+      expect(current).to be(release)
+    end
+  end
+end
+```
+
+Do not assert that the injected collaborator received its reader message: that is an
+outgoing query and therefore setup. Assert the incoming query's return value.
+
+
+## What to Cover for Relation Queries
 
 1. **The scoping boundary** — one in-scope and one out-of-scope record;
    `contain_exactly` proves both inclusion AND exclusion in one assertion.
@@ -148,6 +180,7 @@ specs; one that filters but breaks the chain fails the identity spec.
 - replacing the DB-backed behaviour specs with relation stubs — the spy-based refiner
   contract specs complement them, never substitute for them.
 - covering only the happy scope — exclusion and emptiness are the point.
+- forcing a singular retained object through relation-oriented shared examples.
 - multiple expectations per `it`; the query call outside `execute` (block-matcher and
   raising exceptions aside).
 

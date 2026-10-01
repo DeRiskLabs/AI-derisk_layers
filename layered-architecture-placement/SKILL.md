@@ -4,7 +4,7 @@ title: Layered Architecture and Placement
 description: The mental model for the layer abstractions (user stories, use cases, query objects, form objects), what each is responsible for, how they collaborate, and where each file lives. Load when deciding which abstraction to write or where to put it.
 category: architecture
 status: active
-version: 1.6
+version: 1.7
 applies_to:
   - Ruby
   - Rails
@@ -19,7 +19,7 @@ triggers:
 anti_triggers:
   - pure framework config
 user_invocable: true
-last_reviewed_at: "2026-06-07"
+last_reviewed_at: "2026-10-01"
 ---
 
 
@@ -54,7 +54,7 @@ references/request-flow.md     # a request traced through the layers
 | User story | Orchestrate one user action: find, authorize, compose | `success`/`failure(errors:)` | [[authoring-user-stories]] |
 | Use case | One transactional unit of work | `success`/`failure` | [[authoring-use-cases]] |
 | Form object | Validate params; build domain objects | `valid?` + built objects | [[authoring-form-objects]] |
-| Query object | Scoped, composable reads | a relation / chainable query | [[authoring-query-objects]] |
+| Query object | Side-effect-free application reads | collection/enumerable, or object-or-nil for a singular question | [[authoring-query-objects]] |
 | Model | Data shape, integrity, intrinsic accessors | data | [[authoring-models]] |
 | View model | Shape a record/read for serialization (a PORO answering the resource's attribute methods) | the shaped object | (delivery edge) |
 | Serializer | Present data as JSON:API | response hash | [[authoring-serializers]] |

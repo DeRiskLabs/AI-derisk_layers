@@ -2,9 +2,10 @@
 
 ## Placement & shape
 - [ ] File at `app/lib/queries/<scope>/<name>_query.rb`; class `Queries::<Scope>::<Name>Query`.
-- [ ] Inherits `ApplicationQuery` (the app's `Layers::BaseQueryObject` evolution).
-- [ ] `relation_class 'Model'` set.
-- [ ] `initialize(scope, **)` stores the scope and calls `super(nil, **)`.
+- [ ] Shape matches the question: relation query or singular object-or-nil query.
+- [ ] A relation query inherits `ApplicationQuery`, sets `relation_class 'Model'`, and
+      passes its scope through `initialize(scope, **)` to `super(nil, **)`.
+- [ ] A singular query remains a small PORO and injects its state-holding collaborator.
 
 ## Scoping
 - [ ] The boundary (identity/firm/tenant) applied in private `build_relation_defaults!`.
@@ -15,11 +16,10 @@
 
 ## Boundaries
 - [ ] Read-only: no writes, no side effects, no business logic.
-- [ ] Returns chainable query / relation; `order`/`page`/`per` left to the caller.
+- [ ] Relation refiners are chainable; a singular query returns its object or `nil`.
 
 ## Verify
-- [ ] A dedicated query spec exists: scoping boundary (in-scope returned, out-of-scope
-      excluded, via `contain_exactly`), empty case, each join/condition branch, and
-      chaining (`order`, `page`/`per`).
+- [ ] A dedicated query spec matches the shape: relation boundary/empty/chaining coverage,
+      or singular object identity/absence coverage with an injected collaborator.
 - [ ] The consuming endpoints' request/acceptance specs still cover their scoping and
       empty cases (the wiring) — they complement, not replace, the query spec.

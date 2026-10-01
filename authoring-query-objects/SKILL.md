@@ -1,10 +1,10 @@
 ---
 name: authoring-query-objects
 title: Authoring Query Objects
-description: How to write a query object - a class that encapsulates a scoped, composable ActiveRecord query behind a small interface. Use when adding or changing classes under app/lib/queries.
+description: How to write a query object - either a scoped, composable relation read or a singular object-or-nil read behind a small side-effect-free interface. Use when adding or changing classes under app/lib/queries.
 category: authoring
 status: active
-version: 1.3
+version: 1.4
 applies_to:
   - Ruby
   - Rails
@@ -21,14 +21,15 @@ anti_triggers:
   - user story
   - form object
 user_invocable: true
-last_reviewed_at: "2026-06-07"
+last_reviewed_at: "2026-10-01"
 ---
 
 
 # Authoring Query Objects
 
-A query object encapsulates a **scoped, composable read** of an ActiveRecord model behind a
-small interface, so controllers/user stories never assemble joins and conditions inline.
+A query object encapsulates a side-effect-free application read behind a small interface.
+Collection reads commonly wrap a scoped, composable relation. Explicitly singular reads
+return the object or `nil` and do not need to pretend their source is a relation.
 
 
 ## Required Reading
@@ -51,16 +52,19 @@ references/checklist.md           # authoring checklist
 app/lib/queries/<scope>/<name>_query.rb  →  Queries::<Scope>::<Name>Query
 ```
 
-Scopes group queries by the boundary they enforce, e.g. `IdentityScoped`, `FirmScoped`. A
-base `ApplicationQuery` sits at `app/lib/queries/application_query.rb`. (`ApplicationQuery` is
-the app's richer evolution of the gem's `Layers::BaseQueryObject` — same shape: a default
-relation class, delegated AR methods, an `order`, and a `Paginatable` concern.)
+Scopes group relation queries by the boundary they enforce, e.g. `IdentityScoped`,
+`FirmScoped`. A relation query inherits the app's `ApplicationQuery` over
+`Layers::BaseQueryObject`. A singular object query can be a small PORO when relation,
+ordering, and pagination behavior would be false abstractions.
 
 Scaffold the object + spec pair with `bin/rails generate layers:query_object <name>` —
-never hand-create files a generator scaffolds; fill the generated TODOs.
+never hand-create files a generator scaffolds. The current generator emits a relation
+query shell. For a singular object query, retain the generated path/spec pair and replace
+the relation-specific inheritance and TODOs with the singular protocol below. The
+generator should eventually offer this shape directly.
 
 
-## The Core Contract: Chainable
+## Relation Query Contract: Chainable
 
 Every public method is one of two kinds:
 
@@ -155,6 +159,41 @@ shaping afterwards belong in a **view model**, not the query (see
 [[layered-architecture-placement]]).
 
 
+## Singular Object Queries
+
+An explicitly singular question returns its object or `nil` through one query message,
+normally `#call`. Inject the state-holding collaborator so the query is fast and
+independently testable. A container-owned default may be resolved behind a private seam
+when delivery registries need to construct the query without knowing container state.
+
+```ruby
+module Queries
+  class CurrentReleaseQuery
+    def initialize(current_release: nil)
+      @current_release = current_release || configured_current_release
+    end
+
+    def call
+      current_release.release
+    end
+
+
+    private
+
+    attr_reader :current_release
+
+    def configured_current_release
+      Rails.application.config.x.application.current_release
+    end
+  end
+end
+```
+
+Do not wrap one retained object in a one-element collection or fake relation merely to
+inherit `ApplicationQuery`. Do not add refiners, pagination, or relation delegation to a
+question that has none.
+
+
 ## When to Extract One
 
 A model may carry a few simple scopes ([[authoring-models]]); the moment scopes multiply,
@@ -180,10 +219,10 @@ Queries::IdentityScoped::ArticlesQuery.new(current_identity)
 
 ## Testing Strategy
 
-Query objects are real logic objects — the reads extracted from models so models stay
-thin — and every one gets its own spec. Test with [[testing-query-objects]]: DB-backed
-boundary specs covering the scoping boundary, the empty case, each composed condition,
-and the chainable interface.
+Query objects are real logic objects and every one gets its own spec. Test relation
+queries with DB-backed boundary specs covering scoping, emptiness, composed conditions,
+and chaining. Test singular object queries as fast units with an injected collaborator,
+asserting the returned object by identity or `nil`. See [[testing-query-objects]].
 
 The consuming endpoints' request/acceptance specs still cover their own scoping and empty
 cases — that exercises the wiring, not a substitute for the query's spec.
@@ -192,11 +231,11 @@ cases — that exercises the wiring, not a substitute for the query's spec.
 ## Rules
 
 - A query object is **read-only**. No writes, no side effects.
-- The scope (tenant, identity, firm) is enforced in `build_relation_defaults!` so callers
-  cannot accidentally cross the boundary.
-- Honour the core contract: refining methods return `self`; only terminators return
-  collections/records.
-- Keep SQL fragments in small private methods (one per join/condition) when they grow.
+- Relation queries enforce their scope in `build_relation_defaults!` so callers cannot
+  accidentally cross the boundary.
+- Relation refiners return `self`; only terminators return collections or records.
+- Singular queries return the object or `nil` directly and expose no relation API.
+- Keep SQL fragments in small private methods when relation conditions grow.
 
 
 ## Avoid
